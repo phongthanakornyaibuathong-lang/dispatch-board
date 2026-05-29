@@ -2,959 +2,421 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏗 Daily Dispatch Board — AIT & Services</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🏗 Dispatch Board — AIT & Services</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Noto+Sans+Thai:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-<!-- Google Identity Services (GIS) for Drive backup -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
 <style>
-:root {
-  --bg:      #080E1A;
-  --panel:   #0D1525;
-  --card:    #111C2E;
-  --border:  #1A2840;
-  --border2: #243656;
-  --text:    #E8F0FE;
-  --muted:   #546E8A;
-  --mono:    'IBM Plex Mono', monospace;
-  --sans:    'Noto Sans Thai', sans-serif;
-}
+:root{--bg:#080E1A;--panel:#0D1525;--card:#111C2E;--border:#1A2840;--b2:#243656;--text:#E8F0FE;--muted:#546E8A;--mono:'IBM Plex Mono',monospace;--sans:'Noto Sans Thai',sans-serif;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-thumb{background:#1A2840;border-radius:9px;}
-
-/* ── NAV ── */
-.nav{
-  position:sticky;top:0;z-index:200;
-  background:var(--panel);border-bottom:1px solid var(--border);
-  padding:0 16px;height:54px;
-  display:flex;align-items:center;gap:12px;
-}
-.nav-logo{
-  width:34px;height:34px;background:#1D4ED8;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
-}
-.nav-title{font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.5px;}
-.nav-sub{font-size:9px;color:var(--muted);}
-.nav-date{text-align:right;flex-shrink:0;}
-.nav-date .d1{font-size:12px;font-weight:700;}
-.nav-date .d2{font-size:9px;color:var(--muted);}
-.spacer{flex:1;}
-.btn{
-  border:none;border-radius:8px;padding:7px 14px;cursor:pointer;
-  font-weight:700;font-size:11px;font-family:var(--sans);
-  display:flex;align-items:center;gap:6px;white-space:nowrap;
-  transition:opacity .15s,transform .1s;
-}
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-thumb{background:#1A2840;border-radius:9px;}
+.nav{position:sticky;top:0;z-index:200;background:var(--panel);border-bottom:1px solid var(--border);padding:0 14px;height:54px;display:flex;align-items:center;gap:10px;}
+.logo{width:34px;height:34px;background:#1D4ED8;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.ntitle{font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.5px;}
+.nsub{font-size:9px;color:var(--muted);}
+.sp{flex:1;}
+.ndate{text-align:right;}.ndate .d1{font-size:12px;font-weight:700;}.ndate .d2{font-size:9px;color:var(--muted);}
+.btn{border:none;border-radius:8px;padding:7px 13px;cursor:pointer;font-weight:700;font-size:11px;font-family:var(--sans);display:flex;align-items:center;gap:5px;white-space:nowrap;transition:opacity .15s,transform .1s;}
 .btn:hover{opacity:.85;transform:translateY(-1px);}
-.btn-ghost{background:var(--card);border:1px solid var(--border2);color:var(--text);}
-.btn-primary{background:#1D4ED8;color:#fff;box-shadow:0 4px 14px #1D4ED833;}
-.btn-green{background:#0D9488;color:#fff;}
-.btn-drive{background:#1A73E8;color:#fff;}
-
-/* ── TOAST ── */
-.toast{
-  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-  background:#16A34A;color:#fff;padding:10px 20px;border-radius:10px;
-  font-weight:700;font-size:12px;font-family:var(--sans);
-  opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;
-  white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4);
-}
-.toast.show{opacity:1;}
-.toast.err{background:#DC2626;}
-
-/* ── STATS ── */
-.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
-.stat{
-  background:var(--card);border:1px solid var(--border);border-radius:12px;
-  padding:14px 16px;display:flex;align-items:center;gap:12px;
-  flex:1;min-width:110px;
-}
-.stat-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.stat-val{font-size:24px;font-weight:900;font-family:var(--mono);line-height:1;}
-.stat-lbl{font-size:10px;color:var(--muted);margin-top:2px;}
-
-/* ── FILTERS ── */
-.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
-.fbtn{
-  padding:5px 14px;border-radius:99px;
-  border:2px solid var(--border2);background:transparent;
-  color:var(--muted);font-weight:800;font-size:10px;cursor:pointer;
-  letter-spacing:.8px;font-family:var(--mono);transition:all .12s;
-}
-.fbtn.active{color:#fff;}
-
-/* ── GRID ── */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
-  gap:12px;margin-bottom:18px;
-}
-
-/* ── TEAM CARD ── */
-.card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:14px;overflow:hidden;cursor:pointer;
-  transition:border .15s,transform .15s,box-shadow .15s;
-  display:flex;flex-direction:column;
-}
-.card:hover{border-color:var(--border2);transform:translateY(-1px);}
-.card.active{transform:translateY(-2px);}
-.card-stripe{height:3px;}
-.card-head{
-  padding:10px 13px;display:flex;align-items:center;gap:10px;
-  border-bottom:1px solid var(--border);
-}
-.card-badge{
-  width:30px;height:30px;border-radius:8px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-weight:900;font-size:11px;color:#fff;font-family:var(--mono);
-}
-.card-site{
-  font-weight:700;font-size:12px;overflow:hidden;
-  text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;
-}
-.card-jobno{font-size:10px;color:var(--muted);font-family:var(--mono);}
-.card-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
-.job-tag{
-  font-size:9px;font-weight:800;letter-spacing:1px;
-  padding:2px 7px;border-radius:4px;font-family:var(--mono);
-  border:1px solid transparent;
-}
-.edit-btn{
-  background:var(--border);border:1px solid var(--border2);
-  border-radius:6px;width:26px;height:26px;cursor:pointer;
-  color:var(--muted);font-size:12px;display:flex;
-  align-items:center;justify-content:center;
-  transition:background .12s;
-}
-.edit-btn:hover{background:var(--border2);color:var(--text);}
-.card-body{padding:12px 13px;display:flex;flex-direction:column;gap:8px;flex:1;}
-.time-row{display:flex;gap:8px;}
-.time-box{
-  flex:1;border-radius:8px;padding:6px 0;text-align:center;
-}
-.time-lbl{font-size:9px;color:var(--muted);}
-.time-val{font-size:16px;font-weight:900;font-family:var(--mono);}
-.members{display:flex;flex-wrap:wrap;gap:4px;}
-.pill{
-  border-radius:99px;padding:2px 10px;
-  font-size:11px;font-weight:700;white-space:nowrap;
-}
-.veh-box{
-  background:var(--border);border-radius:8px;padding:6px 10px;
-  font-size:11px;display:flex;align-items:center;gap:6px;
-}
-.veh-text{font-weight:600;}
-.standby-msg{color:var(--muted);font-size:12px;text-align:center;padding:10px 0;}
-
-/* ── TIMELINE ── */
-.timeline-wrap{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:14px;padding:16px 18px;margin-bottom:14px;
-}
-.timeline-title{font-weight:800;font-size:11px;letter-spacing:.5px;margin-bottom:14px;font-family:var(--mono);}
-.timeline-inner{position:relative;height:54px;}
-.tl-line{position:absolute;top:22px;left:0;right:0;height:2px;background:var(--border);border-radius:1px;}
-.tl-tick{position:absolute;top:0;}
-.tl-tick-line{height:22px;border-left:1px dashed var(--border);}
-.tl-tick-lbl{font-size:9px;color:var(--muted);margin-top:4px;transform:translateX(-50%);font-family:var(--mono);}
-.tl-dot{
-  position:absolute;top:12px;
-  width:22px;height:22px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:9px;font-weight:900;color:#fff;font-family:var(--mono);
-  border:2px solid var(--bg);z-index:1;cursor:default;
-  transform:translateX(-50%);
-}
-
-/* ── HINT ── */
-.hint{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:10px;padding:11px 14px;font-size:11px;color:var(--muted);
-}
-.hint strong{color:var(--text);}
-.hint code{color:#1D4ED8;font-family:var(--mono);font-size:10px;}
-
-/* ── MODAL OVERLAY ── */
-.overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.75);
-  backdrop-filter:blur(6px);z-index:1000;
-  display:flex;align-items:center;justify-content:center;padding:16px;
-}
-.modal{
-  background:var(--panel);border-radius:18px;width:100%;max-width:540px;
-  border:1px solid var(--border2);overflow:hidden;
-  box-shadow:0 32px 80px rgba(0,0,0,.6);
-  max-height:92vh;display:flex;flex-direction:column;
-}
-.modal-head{
-  padding:16px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;
-  border-bottom:1px solid var(--border);
-}
-.modal-badge{
-  width:38px;height:38px;border-radius:10px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-weight:900;font-size:14px;color:#fff;font-family:var(--mono);
-}
-.modal-title{color:var(--text);font-weight:800;font-size:15px;}
-.modal-sub{color:var(--muted);font-size:11px;margin-top:2px;}
-.close-btn{
-  background:var(--border);border:1px solid var(--border2);border-radius:8px;
-  width:32px;height:32px;cursor:pointer;color:var(--muted);font-size:17px;
-  display:flex;align-items:center;justify-content:center;margin-left:auto;
-  transition:background .12s;
-}
-.close-btn:hover{background:var(--border2);color:var(--text);}
-.modal-body{padding:16px 20px;overflow-y:auto;flex:1;}
-.jtype-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
-.jtype-btn{
-  padding:5px 12px;border-radius:99px;
-  font-weight:800;font-size:10px;cursor:pointer;letter-spacing:.8px;
-  font-family:var(--mono);transition:all .12s;
-  border:2px solid var(--border2);background:transparent;color:var(--muted);
-}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.form-group{display:flex;flex-direction:column;gap:4px;}
-.form-group.full{grid-column:1/-1;}
-.form-label{font-size:10px;color:var(--muted);}
-.form-input{
-  width:100%;background:var(--input,#08111F);border:1px solid var(--border2);
-  border-radius:8px;color:var(--text);font-size:12px;padding:9px 12px;
-  font-family:var(--sans);outline:none;transition:border .15s;
-}
-.form-input:focus{border-color:#1D4ED8;}
-.modal-foot{
-  padding:13px 20px;border-top:1px solid var(--border);
-  display:flex;gap:10px;justify-content:flex-end;flex-shrink:0;
-}
-
-/* ── PRINT VIEW ── */
-#print-overlay{
-  display:none;position:fixed;inset:0;background:#fff;z-index:3000;overflow-y:auto;
-}
-#print-overlay.show{display:block;}
-.print-bar{
-  background:#1D4ED8;padding:10px 20px;display:flex;align-items:center;gap:10px;
-}
-.print-bar span{color:#fff;font-weight:700;font-size:14px;}
-#print-area{max-width:960px;margin:0 auto;padding:28px 32px;color:#0B1120;font-family:var(--sans);}
-.print-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;border-bottom:3px solid #0B1120;padding-bottom:12px;}
-.print-h1{font-size:20px;font-weight:900;}
-.print-sub{font-size:12px;color:#64748B;margin-top:3px;}
-.print-dr{text-align:right;}
-.print-dr .d1{font-size:14px;font-weight:800;}
-.print-dr .d2{font-size:11px;color:#64748B;}
-.print-stats{display:flex;gap:12px;margin-bottom:20px;}
-.print-stat{flex:1;border-radius:10px;padding:10px 14px;text-align:center;}
-.print-stat .sv{font-size:26px;font-weight:900;line-height:1;}
-.print-stat .sl{font-size:11px;color:#64748B;margin-top:2px;}
-.print-table{width:100%;border-collapse:collapse;font-size:11px;}
-.print-table th{background:#0B1120;color:#fff;padding:8px 9px;text-align:left;font-size:10px;letter-spacing:.4px;}
-.print-table td{padding:7px 9px;border-bottom:1px solid #E2E8F0;vertical-align:top;}
-.print-table tr:nth-child(even) td{background:#F8FAFC;}
-.print-sig{margin-top:36px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;}
-.sig-line{text-align:center;}
-.sig-line .line{border-bottom:1px solid #0B1120;margin-bottom:6px;padding-bottom:28px;}
-.sig-line .lbl{font-size:11px;color:#64748B;}
-.print-footer{margin-top:18px;font-size:9px;color:#94A3B8;text-align:center;}
-.p-badge{display:inline-block;border-radius:5px;padding:2px 7px;font-size:9px;font-weight:800;font-family:monospace;color:#fff;}
-.p-job{border-radius:4px;padding:1px 6px;font-size:9px;font-weight:800;font-family:monospace;border:1px solid transparent;}
-
-/* ── DRIVE MODAL ── */
-.drive-section{margin-top:12px;}
-.drive-section h4{font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:.5px;font-family:var(--mono);}
-.drive-info{background:var(--border);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--muted);line-height:1.6;}
-.drive-info strong{color:var(--text);}
-.drive-files{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;}
-.drive-file{
-  background:var(--border);border-radius:8px;padding:8px 12px;
-  display:flex;align-items:center;gap:10px;cursor:pointer;
-  transition:background .12s;border:1px solid transparent;
-}
-.drive-file:hover{background:var(--border2);border-color:var(--border2);}
-.drive-file-icon{font-size:16px;flex-shrink:0;}
-.drive-file-name{font-size:12px;font-weight:600;flex:1;}
-.drive-file-date{font-size:10px;color:var(--muted);}
-
-@media(max-width:600px){
-  .nav{padding:0 12px;gap:8px;}
-  .btn span{display:none;}
-  .form-grid{grid-template-columns:1fr;}
-  .form-group.full{grid-column:1;}
-  .print-stats{flex-wrap:wrap;}
-  .print-sig{grid-template-columns:1fr;}
-}
-@media print{
-  .print-bar,.no-print{display:none!important;}
-  #print-area{padding:16px 20px;max-width:100%;}
-  body{background:#fff;}
-}
+.bg{background:var(--card);border:1px solid var(--b2);color:var(--text);}
+.bp{background:#1D4ED8;color:#fff;}
+.bv{background:#16A34A;color:#fff;}
+.br{background:#DC2626;color:#fff;}
+.sbar{background:var(--panel);border-bottom:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:10px;font-size:11px;}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background .3s;}
+.sdot.ok{background:#16A34A;box-shadow:0 0 6px #16A34A88;}
+.sdot.sync{background:#F59E0B;animation:pu 1s infinite;}
+.sdot.err{background:#DC2626;}
+@keyframes pu{0%,100%{opacity:1;}50%{opacity:.3;}}
+.stxt{color:var(--muted);flex:1;}
+.mbadge{padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;font-family:var(--mono);}
+.mbadge.view{background:#1A2840;color:var(--muted);}
+.mbadge.edit{background:#16A34A22;color:#16A34A;border:1px solid #16A34A55;}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#16A34A;color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.toast.show{opacity:1;}.toast.err{background:#DC2626;}.toast.warn{background:#B45309;}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:11px;flex:1;min-width:100px;}
+.sico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.sval{font-size:22px;font-weight:900;font-family:var(--mono);line-height:1;}
+.slbl{font-size:10px;color:var(--muted);margin-top:2px;}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.fb{padding:5px 13px;border-radius:99px;border:2px solid var(--b2);background:transparent;color:var(--muted);font-weight:800;font-size:10px;cursor:pointer;letter-spacing:.8px;font-family:var(--mono);transition:all .12s;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:11px;margin-bottom:16px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border .15s,transform .12s;}
+.stripe{height:3px;}.chead{padding:9px 12px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border);}
+.cbadge{width:29px;height:29px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:#fff;font-family:var(--mono);}
+.csite{font-weight:700;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+.cjn{font-size:10px;color:var(--muted);font-family:var(--mono);}
+.jtag{font-size:9px;font-weight:800;letter-spacing:1px;padding:2px 7px;border-radius:4px;font-family:var(--mono);border:1px solid transparent;}
+.ebtn{background:var(--border);border:1px solid var(--b2);border-radius:6px;width:26px;height:26px;cursor:pointer;color:var(--muted);font-size:12px;display:flex;align-items:center;justify-content:center;transition:background .12s;}
+.ebtn:hover{background:var(--b2);color:var(--text);}
+.cbody{padding:11px 12px;flex:1;display:flex;flex-direction:column;gap:7px;}
+.trow{display:flex;gap:7px;}.tbox{flex:1;border-radius:8px;padding:5px 0;text-align:center;}
+.tlbl{font-size:9px;color:var(--muted);}.tval{font-size:15px;font-weight:900;font-family:var(--mono);}
+.mems{display:flex;flex-wrap:wrap;gap:4px;}
+.pill{border-radius:99px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;}
+.vbox{background:var(--border);border-radius:8px;padding:5px 10px;font-size:11px;display:flex;align-items:center;gap:6px;}
+.sbmsg{color:var(--muted);font-size:12px;text-align:center;padding:10px 0;}
+.tlwrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px 17px;margin-bottom:13px;}
+.tltitle{font-weight:800;font-size:11px;letter-spacing:.5px;margin-bottom:13px;font-family:var(--mono);}
+.tlinner{position:relative;height:52px;}
+.tlline{position:absolute;top:21px;left:0;right:0;height:2px;background:var(--border);}
+.tltick{position:absolute;top:0;}
+.tltickl{height:21px;border-left:1px dashed var(--border);}
+.tltickn{font-size:9px;color:var(--muted);margin-top:3px;transform:translateX(-50%);font-family:var(--mono);}
+.tldot{position:absolute;top:11px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;font-family:var(--mono);border:2px solid var(--bg);z-index:1;transform:translateX(-50%);}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:14px;}
+.modal{background:var(--panel);border-radius:18px;width:100%;max-width:500px;border:1px solid var(--b2);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.6);max-height:92vh;display:flex;flex-direction:column;}
+.mh{padding:15px 18px;display:flex;align-items:center;gap:11px;flex-shrink:0;border-bottom:1px solid var(--border);}
+.mbg{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;font-family:var(--mono);}
+.mt{color:var(--text);font-weight:800;font-size:14px;}.ms{color:var(--muted);font-size:11px;margin-top:2px;}
+.xbtn{background:var(--border);border:1px solid var(--b2);border-radius:8px;width:30px;height:30px;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center;margin-left:auto;}
+.xbtn:hover{background:var(--b2);color:var(--text);}
+.mbody{padding:14px 18px;overflow-y:auto;flex:1;}
+.jtr{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.jb{padding:5px 11px;border-radius:99px;font-weight:800;font-size:10px;cursor:pointer;letter-spacing:.8px;font-family:var(--mono);transition:all .12s;border:2px solid var(--b2);background:transparent;color:var(--muted);}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.fg{display:flex;flex-direction:column;gap:3px;}.fg.full{grid-column:1/-1;}
+.fl{font-size:10px;color:var(--muted);}
+.fi{width:100%;background:#08111F;border:1px solid var(--b2);border-radius:8px;color:var(--text);font-size:12px;padding:8px 11px;font-family:var(--sans);outline:none;transition:border .15s;}
+.fi:focus{border-color:#1D4ED8;}
+.mfoot{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:9px;justify-content:flex-end;flex-shrink:0;}
+/* PIN */
+.pmod{background:var(--panel);border-radius:18px;width:100%;max-width:340px;border:1px solid var(--b2);padding:28px 24px;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.7);}
+.pico{font-size:36px;margin-bottom:10px;}.pt1{font-size:16px;font-weight:800;margin-bottom:4px;}.pt2{font-size:11px;color:var(--muted);margin-bottom:18px;}
+.pi{width:100%;background:#08111F;border:2px solid var(--b2);border-radius:10px;color:var(--text);font-size:22px;padding:12px;text-align:center;outline:none;font-family:var(--mono);letter-spacing:6px;transition:border .15s;}
+.pi:focus{border-color:#1D4ED8;}.pbtn{margin-top:12px;width:100%;padding:11px;border-radius:10px;background:#1D4ED8;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;}
+.perr{color:#DC2626;font-size:11px;margin-top:8px;min-height:18px;}
+/* SAVE FLOAT */
+.sfloat{position:fixed;bottom:20px;right:20px;z-index:500;background:var(--panel);border:1px solid var(--b2);border-radius:14px;padding:11px 15px;box-shadow:0 8px 32px rgba(0,0,0,.5);display:flex;align-items:center;gap:10px;}
+/* SETUP MODAL */
+.setup-body{padding:18px;display:flex;flex-direction:column;gap:14px;}
+.setup-note{font-size:11px;color:var(--muted);line-height:1.6;background:var(--border);padding:10px 12px;border-radius:8px;}
+/* PRINT */
+#pov{display:none;position:fixed;inset:0;background:#fff;z-index:3000;overflow-y:auto;}
+#pov.show{display:block;}
+.pbar{background:#1D4ED8;padding:10px 18px;display:flex;align-items:center;gap:10px;}
+.pbar span{color:#fff;font-weight:700;font-size:13px;}
+#pa{max-width:960px;margin:0 auto;padding:24px 28px;color:#0B1120;font-family:var(--sans);}
+@media(max-width:600px){.fgrid{grid-template-columns:1fr;}.fg.full{grid-column:1;}}
+@media print{.pbar,.nopr{display:none!important;}#pa{padding:14px 18px;max-width:100%;}body{background:#fff;}}
 </style>
 </head>
 <body>
-
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- NAV -->
 <nav class="nav">
-  <div class="nav-logo">🏗</div>
-  <div>
-    <div class="nav-title">DISPATCH BOARD</div>
-    <div class="nav-sub">AIT &amp; Services Co., Ltd.</div>
-  </div>
-  <div class="spacer"></div>
-  <div class="nav-date">
-    <div class="d1" id="nav-date-th"></div>
-    <div class="d2" id="nav-date-en"></div>
-  </div>
-  <label class="btn btn-ghost" title="Import Excel">
-    <span>📥</span><span>Import Excel</span>
-    <input type="file" accept=".xlsx,.xls" id="xl-input" style="display:none">
-  </label>
-  <button class="btn btn-drive" onclick="openDriveModal()" title="Google Drive Backup">
-    <span>☁️</span><span>Drive Backup</span>
-  </button>
-  <button class="btn btn-primary" onclick="openPrint()" title="Print Briefing">
-    <span>🖨</span><span>Print Brief</span>
-  </button>
+  <div class="logo">🏗</div>
+  <div><div class="ntitle">DISPATCH BOARD</div><div class="nsub">AIT &amp; Services Co., Ltd.</div></div>
+  <div class="sp"></div>
+  <div class="ndate"><div class="d1" id="nth"></div><div class="d2" id="nen"></div></div>
+  <button class="btn bg" onclick="openPrint()">🖨 <span>Print</span></button>
+  <button class="btn bg" id="mbtn" onclick="toggleMode()">🔒 <span id="mlbl">Admin</span></button>
 </nav>
 
-<!-- MAIN -->
-<div style="padding:16px;max-width:1400px;margin:0 auto;">
-  <!-- stats -->
-  <div class="stats" id="stats-row"></div>
-  <!-- filters -->
-  <div class="filters" id="filters"></div>
-  <!-- grid -->
-  <div class="grid" id="card-grid"></div>
-  <!-- timeline -->
-  <div class="timeline-wrap">
-    <div class="timeline-title">⏱ TIMELINE ออกเดินทาง</div>
-    <div class="timeline-inner" id="timeline"></div>
-  </div>
-  <!-- hint -->
-  <div class="hint">
-    💡 <strong>Excel Import:</strong> คอลัมน์ตามลำดับ →
-    <code>Team | JobType | Site | JobNo | Depart | Arrive | Members | Vehicle | Equipment | Contact</code>
-    (แถวที่ 2 เป็นต้นไป, max 10 แถว) &nbsp;|&nbsp;
-    💾 ข้อมูลบันทึกใน <strong>Browser</strong> อัตโนมัติ &nbsp;|&nbsp;
-    ☁️ กด <strong>Drive Backup</strong> เพื่อสำรองขึ้น Google Drive
-  </div>
+<div class="sbar">
+  <div class="sdot ok" id="sd"></div>
+  <span class="stxt" id="st">กำลังโหลด...</span>
+  <span class="mbadge view" id="mb">👁 VIEW ONLY</span>
+</div>
+
+<div id="ibar" style="display:none;background:var(--panel);border-bottom:1px solid var(--border);padding:8px 14px;display:none;gap:8px;flex-wrap:wrap;" class="nopr">
+  <label class="btn bg" style="cursor:pointer">📥 Import Excel<input type="file" accept=".xlsx,.xls" id="xli" style="display:none"></label>
+  <button class="btn bg" onclick="resetD()">🔄 Reset</button>
+</div>
+
+<div style="padding:14px;max-width:1400px;margin:0 auto;">
+  <div class="stats" id="sr"></div>
+  <div class="filters" id="fi"></div>
+  <div class="grid" id="cg"></div>
+  <div class="tlwrap"><div class="tltitle">⏱ TIMELINE ออกเดินทาง</div><div class="tlinner" id="tl"></div></div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 13px;font-size:11px;color:var(--muted);" id="lub">🔄 refresh อัตโนมัติทุก 60 วิ</div>
+</div>
+
+<!-- SAVE FLOAT -->
+<div class="sfloat" id="sf" style="display:none">
+  <span style="font-size:11px;color:var(--muted)">⚠️ มีการแก้ไข</span>
+  <button class="btn bv" onclick="saveCloud()">☁️ Save &amp; Sync ทีม</button>
 </div>
 
 <!-- EDIT MODAL -->
-<div class="overlay" id="edit-overlay" style="display:none" onclick="closeEdit(event)">
+<div class="ov" id="eov" style="display:none" onclick="if(event.target.id==='eov')closeE()">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-head">
-      <div class="modal-badge" id="edit-badge"></div>
-      <div>
-        <div class="modal-title" id="edit-title"></div>
-        <div class="modal-sub">กรอกรายละเอียดงานวันนี้</div>
-      </div>
-      <button class="close-btn" onclick="closeEditModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="jtype-row" id="jtype-row"></div>
-      <div class="form-grid">
-        <div class="form-group full">
-          <label class="form-label">📍 Site / ลูกค้า</label>
-          <input class="form-input" id="f-site" placeholder="เช่น SCC ศรีราชา (Thaioil CFP Site)">
-        </div>
-        <div class="form-group">
-          <label class="form-label">📋 Job No.</label>
-          <input class="form-input" id="f-jobno" placeholder="JB260096">
-        </div>
-        <div class="form-group">
-          <label class="form-label">📞 ติดต่อ / หมายเหตุ</label>
-          <input class="form-input" id="f-contact" placeholder="ชื่อ เบอร์โทร">
-        </div>
-        <div class="form-group">
-          <label class="form-label">🚀 เวลาออกเดินทาง</label>
-          <input class="form-input" id="f-depart" type="time">
-        </div>
-        <div class="form-group">
-          <label class="form-label">🏁 เวลาถึงหน้างาน</label>
-          <input class="form-input" id="f-arrive" type="time">
-        </div>
-        <div class="form-group full">
-          <label class="form-label">👷 ทีมงาน (ชื่อเล่น คั่นด้วย ,)</label>
-          <input class="form-input" id="f-members" placeholder="บิ๊ก, โอม, บีม, โอ๊ด">
-        </div>
-        <div class="form-group">
-          <label class="form-label">🚗 ทะเบียนรถ</label>
-          <input class="form-input" id="f-vehicle" placeholder="1ฒษ 2857 (แครี่บอย)">
-        </div>
-        <div class="form-group">
-          <label class="form-label">⚙️ เครื่องมือ / อุปกรณ์</label>
-          <input class="form-input" id="f-equip" placeholder="TTFF-24 S/N250948">
-        </div>
+    <div class="mh"><div class="mbg" id="ebg"></div><div><div class="mt" id="et"></div><div class="ms">แก้ไขข้อมูลงานวันนี้</div></div><button class="xbtn" onclick="closeE()">✕</button></div>
+    <div class="mbody">
+      <div class="jtr" id="jtr"></div>
+      <div class="fgrid">
+        <div class="fg full"><label class="fl">📍 Site / ลูกค้า</label><input class="fi" id="fs" placeholder="SCC ศรีราชา"></div>
+        <div class="fg"><label class="fl">📋 Job No.</label><input class="fi" id="fj" placeholder="JB260096"></div>
+        <div class="fg"><label class="fl">📞 ติดต่อ</label><input class="fi" id="fc" placeholder="ชื่อ เบอร์โทร"></div>
+        <div class="fg"><label class="fl">🚀 ออกเดินทาง</label><input class="fi" id="fd" type="time"></div>
+        <div class="fg"><label class="fl">🏁 ถึงหน้างาน</label><input class="fi" id="fa" type="time"></div>
+        <div class="fg full"><label class="fl">👷 ทีมงาน (คั่นด้วย ,)</label><input class="fi" id="fm" placeholder="บิ๊ก, โอม, บีม"></div>
+        <div class="fg"><label class="fl">🚗 ทะเบียนรถ</label><input class="fi" id="fv" placeholder="1ฒษ 2857"></div>
+        <div class="fg"><label class="fl">⚙️ เครื่องมือ</label><input class="fi" id="fe" placeholder="TTFF-24"></div>
       </div>
     </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeEditModal()">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveEdit()">💾 บันทึก</button>
-    </div>
+    <div class="mfoot"><button class="btn bg" onclick="closeE()">ยกเลิก</button><button class="btn bp" onclick="saveE()">💾 บันทึก</button></div>
   </div>
 </div>
 
-<!-- DRIVE MODAL -->
-<div class="overlay" id="drive-overlay" style="display:none" onclick="closeDriveModal(event)">
-  <div class="modal" style="max-width:480px" onclick="event.stopPropagation()">
-    <div class="modal-head">
-      <div class="modal-badge" style="background:#1A73E8">☁️</div>
-      <div>
-        <div class="modal-title">Google Drive Backup</div>
-        <div class="modal-sub">สำรองและกู้คืนข้อมูล Dispatch Board</div>
-      </div>
-      <button class="close-btn" onclick="document.getElementById('drive-overlay').style.display='none'">✕</button>
-    </div>
-    <div class="modal-body">
-      <div id="drive-auth-section">
-        <div class="drive-info" style="margin-bottom:12px">
-          เชื่อมต่อ Google Account เพื่อ backup ข้อมูลขึ้น Google Drive อัตโนมัติ
-        </div>
-        <button class="btn btn-drive" style="width:100%;justify-content:center;padding:12px" onclick="signInGoogle()">
-          🔑 Sign in with Google
-        </button>
-      </div>
-      <div id="drive-signed-section" style="display:none">
-        <div class="drive-info">
-          <strong>✅ เชื่อมต่อแล้ว:</strong> <span id="drive-user-email"></span><br>
-          ไฟล์จะถูกบันทึกใน Google Drive → โฟลเดอร์ <strong>DispatchBoard</strong>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-          <button class="btn btn-green" style="flex:1;justify-content:center" onclick="backupToDrive()">
-            ☁️ Backup ตอนนี้
-          </button>
-          <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="loadDriveFiles()">
-            📂 โหลดไฟล์สำรอง
-          </button>
-          <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="signOutGoogle()">
-            🚪 Sign Out
-          </button>
-        </div>
-        <div class="drive-section">
-          <h4>ไฟล์สำรองล่าสุด</h4>
-          <div class="drive-files" id="drive-files-list">
-            <div style="color:var(--muted);font-size:11px;padding:8px">กด "โหลดไฟล์สำรอง" เพื่อดูรายการ</div>
-          </div>
-        </div>
-      </div>
+<!-- PIN MODAL -->
+<div class="ov" id="pov2" style="display:none" onclick="if(event.target.id==='pov2'){document.getElementById('pov2').style.display='none';}">
+  <div class="pmod" onclick="event.stopPropagation()">
+    <div class="pico">🔑</div>
+    <div class="pt1">Admin Login</div>
+    <div class="pt2">ใส่ PIN 4 หลัก เพื่อเข้าโหมดแก้ไข</div>
+    <input class="pi" id="pi" type="password" maxlength="4" placeholder="••••" oninput="if(this.value.length===4)checkPin()">
+    <div class="perr" id="pe"></div>
+  </div>
+</div>
+
+<!-- SETUP MODAL (first time: enter GH token) -->
+<div class="ov" id="sov" style="display:none" onclick="event.stopPropagation()">
+  <div class="modal" style="max-width:420px" onclick="event.stopPropagation()">
+    <div class="mh"><div class="mbg" style="background:#16A34A">⚙️</div><div><div class="mt">ตั้งค่า Admin (ครั้งแรก)</div><div class="ms">กรอก GitHub Token เพื่อ save ข้อมูลขึ้น cloud</div></div></div>
+    <div class="setup-body">
+      <div class="setup-note">🔒 Token จะเก็บใน <strong>browser ของคุณเท่านั้น</strong> (sessionStorage) ไม่มีใครเห็น ทีมงานที่เปิด URL เดียวกันจะเห็นแค่ข้อมูล ไม่เห็น token</div>
+      <div class="fg"><label class="fl">GitHub Personal Access Token (scope: repo)</label><input class="fi" id="ghi" type="password" placeholder="ghp_xxxxxxxxxxxx"></div>
+      <button class="btn bv" style="width:100%;justify-content:center;padding:11px" onclick="saveToken()">✅ บันทึก Token</button>
     </div>
   </div>
 </div>
 
 <!-- PRINT OVERLAY -->
-<div id="print-overlay">
-  <div class="print-bar no-print">
-    <span>🖨 Print Preview — Briefing Sheet</span>
-    <div style="flex:1"></div>
-    <button class="btn" style="background:#fff;color:#1D4ED8;font-weight:800" onclick="window.print()">🖨 พิมพ์เดี๋ยวนี้</button>
-    <button class="btn btn-ghost" style="margin-left:8px;color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.3)" onclick="closePrint()">✕ ปิด</button>
+<div id="pov">
+  <div class="pbar nopr"><span>🖨 Print Preview</span><div style="flex:1"></div>
+    <button class="btn" style="background:#fff;color:#1D4ED8;font-weight:800" onclick="window.print()">พิมพ์</button>
+    <button class="btn bg" style="margin-left:8px" onclick="document.getElementById('pov').classList.remove('show')">✕</button>
   </div>
-  <div id="print-area"></div>
+  <div id="pa"></div>
 </div>
 
 <script>
-/* ════════════════════════════════════
-   DATA
-════════════════════════════════════ */
-const PALETTE = [
-  {bg:"#1D4ED8",name:"T-01"},{bg:"#DC2626",name:"T-02"},
-  {bg:"#0D9488",name:"T-03"},{bg:"#EA580C",name:"T-04"},
-  {bg:"#7C3AED",name:"T-05"},{bg:"#16A34A",name:"T-06"},
-  {bg:"#B45309",name:"T-07"},{bg:"#0369A1",name:"T-08"},
-  {bg:"#BE185D",name:"T-09"},{bg:"#475569",name:"T-10"},
+const GH_USER='phongthanakornyaibuathong-lang';
+const GH_REPO='dispatch-board';
+const ADMIN_PIN='1234';
+const RAW=`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/main/data.json?t=`;
+const PAL=[
+  {bg:"#1D4ED8",n:"T-01"},{bg:"#DC2626",n:"T-02"},{bg:"#0D9488",n:"T-03"},
+  {bg:"#EA580C",n:"T-04"},{bg:"#7C3AED",n:"T-05"},{bg:"#16A34A",n:"T-06"},
+  {bg:"#B45309",n:"T-07"},{bg:"#0369A1",n:"T-08"},{bg:"#BE185D",n:"T-09"},
+  {bg:"#475569",n:"T-10"},
 ];
-const JOB_TYPES = [
-  {id:"BOLT",    label:"BOLT",      color:"#1D4ED8"},
-  {id:"FLANGE",  label:"FLANGE",    color:"#0D9488"},
-  {id:"COLD_CUT",label:"COLD CUT",  color:"#DC2626"},
-  {id:"TRAINING",label:"TRAINING",  color:"#7C3AED"},
-  {id:"ROBOT",   label:"ROBOT",     color:"#B45309"},
-  {id:"STANDBY", label:"STANDBY",   color:"#475569"},
+const JOBS=[
+  {id:"BOLT",l:"BOLT",c:"#1D4ED8"},{id:"FLANGE",l:"FLANGE",c:"#0D9488"},
+  {id:"COLD_CUT",l:"COLD CUT",c:"#DC2626"},{id:"TRAINING",l:"TRAINING",c:"#7C3AED"},
+  {id:"ROBOT",l:"ROBOT",c:"#B45309"},{id:"STANDBY",l:"STANDBY",c:"#475569"},
 ];
-const SEED = [
-  {id:1,jobType:"BOLT",    site:"SCC ศรีราชา (Thaioil CFP Site)",   jobNo:"JB260096",depart:"06:30",arrive:"07:00",members:"บิ๊ก, โอม, บีม, โอ๊ด",   vehicle:"1ฒษ 2857 (แครี่บอย)",  equipment:"TTFF-24 S/N250948",       contact:"กับตัน 080-047-1014"},
-  {id:2,jobType:"BOLT",    site:"SCC Work Shop ศรีราชา",             jobNo:"JB260089",depart:"06:30",arrive:"08:00",members:"คิง, ทาม, เฟิร์ส, คิว",   vehicle:"ผบ 6278 (แครี่บอย)",   equipment:"TOFF-12 S/N26020099",     contact:"เพียว 092-621-6363"},
-  {id:3,jobType:"FLANGE",  site:"UCS ศรีราชา (Thaioil CFP A.17)",   jobNo:"JB260095",depart:"06:30",arrive:"08:00",members:"เป้, กาน(นำ), อองรี",      vehicle:"ผบ 6279 (แครี่บอย)",   equipment:"TTFF-24 (ถาดรองเศษ)",    contact:"ฉัตรชัย 093-334-9527"},
-  {id:4,jobType:"FLANGE",  site:"SCG / DSAM",                        jobNo:"JB260103",depart:"06:00",arrive:"07:00",members:"แชมป์, ป๋อ, เอิร์ก",       vehicle:"กบ 2192 (4 ประตู)",   equipment:"TOFF-12 New",             contact:"บอย 081-919-0854"},
-  {id:5,jobType:"COLD_CUT",site:"NPC / TNS บางปะกง",                jobNo:"JB260108",depart:"06:30",arrive:"08:00",members:"อั๋น, นัฐ, ทาม, ไอซ์",     vehicle:"ผบ 7869 (แค็บบรรทุก)",equipment:"TTFF-40",                 contact:"นัตตี้ 098-278-4490"},
-  {id:6,jobType:"BOLT",    site:"Kuraray / Sriprapaphan",             jobNo:"JB260097",depart:"07:00",arrive:"08:00",members:"นัท, คิว, ต้าร์",           vehicle:"2ฒษ 2857 (แครี่บอย)",  equipment:"Tension A/F 90,110,115",  contact:"ปื๊ด 096-297-2292"},
-  {id:7,jobType:"TRAINING",site:"Thai Oil Training (TOP)",            jobNo:"JB260XXX",depart:"07:30",arrive:"08:00",members:"กรานต์, นาย, บุษ",          vehicle:"ผจ 662",               equipment:"Training Equipment",      contact:"พี่นุ / พี่ต้อม"},
-  {id:8,jobType:"ROBOT",   site:"CUEL งาน Torque Unit 3",            jobNo:"JB260098",depart:"06:30",arrive:"07:30",members:"ป๋อ, แชมป์, อั๋น",           vehicle:"1ฒษ 2857",             equipment:"TTFF-24",                 contact:"ปิยพงษ์ 099-441-9388"},
-  {id:9, jobType:"STANDBY",site:"",jobNo:"",depart:"",arrive:"",members:"",vehicle:"",equipment:"",contact:""},
-  {id:10,jobType:"STANDBY",site:"",jobNo:"",depart:"",arrive:"",members:"",vehicle:"",equipment:"",contact:""},
-];
+let teams=[],filt="ALL",eid=null,ejt="STANDBY",isAdmin=false,dirty=false,timer=null;
+const jc=id=>JOBS.find(j=>j.id===id)?.c??"#475569";
+const jl=id=>JOBS.find(j=>j.id===id)?.l??id;
+const isSB=t=>t.jobType==="STANDBY"||!t.site;
+const mArr=s=>s?s.split(",").map(x=>x.trim()).filter(Boolean):[];
+function thd(){
+  const d=new Date(),
+    dy=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"],
+    mo=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  return`วัน${dy[d.getDay()]}ที่ ${d.getDate()} ${mo[d.getMonth()]} ${d.getFullYear()+543}`;
+}
+let tt;
+function toast(m,t="ok"){const e=document.getElementById("toast");e.textContent=m;e.className="toast show"+(t==="err"?" err":t==="warn"?" warn":"");clearTimeout(tt);tt=setTimeout(()=>e.className="toast",3500);}
+function setSS(s,t){document.getElementById("sd").className="sdot "+s;document.getElementById("st").textContent=t;}
 
-const STORAGE_KEY = "dispatch_board_v1";
-let teams = [];
-let filterType = "ALL";
-let editId = null;
-let editJobType = "STANDBY";
+// Token stored only in sessionStorage (browser-only, not in code)
+function getToken(){return sessionStorage.getItem("gh_token")||"";}
+function saveToken(){
+  const t=document.getElementById("ghi").value.trim();
+  if(!t.startsWith("ghp_")){toast("Token ไม่ถูกต้อง — ต้องขึ้นต้นด้วย ghp_","err");return;}
+  sessionStorage.setItem("gh_token",t);
+  document.getElementById("sov").style.display="none";
+  toast("✅ บันทึก Token แล้ว");
+  enterAdmin();
+}
 
-/* ── load / save ── */
-function loadData(){
+async function loadCloud(){
+  setSS("sync","กำลังโหลดข้อมูลจาก cloud...");
   try{
-    const s = localStorage.getItem(STORAGE_KEY);
-    teams = s ? JSON.parse(s) : JSON.parse(JSON.stringify(SEED));
-  }catch(e){ teams = JSON.parse(JSON.stringify(SEED)); }
-}
-function saveData(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(teams));
-}
-
-/* ════════════════════════════════════
-   DATE
-════════════════════════════════════ */
-function initDate(){
-  const d = new Date();
-  const days=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
-  const months=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
-  document.getElementById("nav-date-th").textContent =
-    `วัน${days[d.getDay()]}ที่ ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()+543}`;
-  document.getElementById("nav-date-en").textContent =
-    d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
-}
-function thaiDate(){
-  const d=new Date();
-  const days=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
-  const months=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
-  return `วัน${days[d.getDay()]}ที่ ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()+543}`;
+    const r=await fetch(RAW+Date.now());
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    const d=await r.json();
+    teams=d.teams||[];
+    const lu=d.lastUpdated?new Date(d.lastUpdated).toLocaleString("th-TH",{dateStyle:"short",timeStyle:"short"}):"—";
+    const by=d.updatedBy||"—";
+    setSS("ok",`อัพเดทล่าสุด: ${by} · ${lu}`);
+    document.getElementById("lub").innerHTML=`🟢 Sync สำเร็จ · อัพเดทโดย <strong style="color:var(--text)">${by}</strong> เมื่อ ${lu} · auto-refresh 60 วิ`;
+    renderAll();
+  }catch(e){
+    setSS("err","โหลดไม่สำเร็จ: "+e.message);
+    try{const s=localStorage.getItem("db_v2");if(s)teams=JSON.parse(s);}catch(_){}
+    renderAll();
+  }
 }
 
-/* ════════════════════════════════════
-   TOAST
-════════════════════════════════════ */
-let toastTimer;
-function showToast(msg, isErr=false){
-  const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.className = "toast show" + (isErr?" err":"");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>el.className="toast", 3500);
+async function saveCloud(){
+  const tok=getToken();
+  if(!tok){document.getElementById("sov").style.display="flex";return;}
+  setSS("sync","กำลัง save...");toast("⏳ กำลัง sync ขึ้น cloud...");
+  try{
+    const rs=await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/data.json`,
+      {headers:{"Authorization":"token "+tok}});
+    const sd=await rs.json();
+    if(!sd.sha)throw new Error(sd.message||"Cannot get SHA");
+    const payload={teams,lastUpdated:new Date().toISOString(),updatedBy:"Nine",date:new Date().toLocaleDateString("th-TH")};
+    const b64=btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2))));
+    const r=await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/data.json`,{
+      method:"PUT",
+      headers:{"Authorization":"token "+tok,"Content-Type":"application/json"},
+      body:JSON.stringify({message:"Dispatch update "+new Date().toLocaleString("th-TH"),content:b64,sha:sd.sha})
+    });
+    const d=await r.json();
+    if(d.content){
+      dirty=false;document.getElementById("sf").style.display="none";
+      localStorage.setItem("db_v2",JSON.stringify(teams));
+      setSS("ok","Sync สำเร็จ ✅");
+      toast("☁️ Sync เรียบร้อย — ทีมงานเห็นข้อมูลใหม่ใน 60 วิ");
+    }else throw new Error(d.message||"Unknown");
+  }catch(e){setSS("err","Save ไม่สำเร็จ");toast("❌ "+e.message,"err");}
 }
 
-/* ════════════════════════════════════
-   HELPERS
-════════════════════════════════════ */
-function memberArr(s){ return s ? s.split(",").map(x=>x.trim()).filter(Boolean) : []; }
-function jobColor(id){ return JOB_TYPES.find(j=>j.id===id)?.color??"#475569"; }
-function jobLabel(id){ return JOB_TYPES.find(j=>j.id===id)?.label??id; }
-function isStandby(t){ return t.jobType==="STANDBY"||!t.site; }
+function startRefresh(){clearInterval(timer);timer=setInterval(()=>{if(!dirty)loadCloud();},60000);}
 
-/* ════════════════════════════════════
-   RENDER STATS
-════════════════════════════════════ */
+// Admin
+function toggleMode(){isAdmin?exitAdmin():openPin();}
+function openPin(){document.getElementById("pi").value="";document.getElementById("pe").textContent="";document.getElementById("pov2").style.display="flex";setTimeout(()=>document.getElementById("pi").focus(),100);}
+function checkPin(){
+  if(document.getElementById("pi").value===ADMIN_PIN){
+    document.getElementById("pov2").style.display="none";
+    if(!getToken()){document.getElementById("sov").style.display="flex";}
+    else enterAdmin();
+  }else{document.getElementById("pe").textContent="PIN ไม่ถูกต้อง";document.getElementById("pi").value="";}
+}
+function enterAdmin(){
+  isAdmin=true;
+  document.getElementById("mbtn").innerHTML='🔓 <span>ออก</span>';
+  document.getElementById("mb").className="mbadge edit";document.getElementById("mb").textContent="✏️ EDIT MODE";
+  document.getElementById("ibar").style.display="flex";
+  renderCards();toast("🔓 เข้าสู่โหมดแก้ไข");
+}
+function exitAdmin(){
+  isAdmin=false;dirty=false;
+  document.getElementById("mbtn").innerHTML='🔒 <span>Admin</span>';
+  document.getElementById("mb").className="mbadge view";document.getElementById("mb").textContent="👁 VIEW ONLY";
+  document.getElementById("ibar").style.display="none";document.getElementById("sf").style.display="none";
+  renderCards();toast("🔒 ออกจากโหมดแก้ไข");
+}
+
+// Render
+function renderAll(){renderStats();renderFilters();renderCards();renderTL();}
 function renderStats(){
-  const active = teams.filter(t=>!isStandby(t));
-  const pax    = active.reduce((s,t)=>s+memberArr(t.members).length,0);
-  const vehs   = new Set(active.map(t=>t.vehicle).filter(v=>v&&v!=="—")).size;
-  const sb     = teams.filter(t=>isStandby(t)).length;
-  const items  = [
-    {icon:"🚀",val:active.length,lbl:"ทีมออกงาน",  color:"#1D4ED8"},
-    {icon:"👷",val:pax,          lbl:"กำลังพลรวม", color:"#0D9488"},
-    {icon:"🚗",val:vehs,         lbl:"รถออกงาน",   color:"#EA580C"},
-    {icon:"⏸",val:sb,            lbl:"ทีมสำรอง",   color:"#475569"},
-    {icon:"📋",val:active.length,lbl:"Total Jobs",  color:"#7C3AED"},
-  ];
-  document.getElementById("stats-row").innerHTML = items.map(i=>`
-    <div class="stat">
-      <div class="stat-icon" style="background:${i.color}20">${i.icon}</div>
-      <div>
-        <div class="stat-val">${i.val}</div>
-        <div class="stat-lbl">${i.lbl}</div>
-      </div>
-    </div>`).join("");
+  const a=teams.filter(t=>!isSB(t)),pax=a.reduce((s,t)=>s+mArr(t.members).length,0),v=new Set(a.map(t=>t.vehicle).filter(x=>x&&x!=="—")).size;
+  document.getElementById("sr").innerHTML=[{i:"🚀",v:a.length,l:"ทีมออกงาน",c:"#1D4ED8"},{i:"👷",v:pax,l:"กำลังพลรวม",c:"#0D9488"},{i:"🚗",v:v,l:"รถออกงาน",c:"#EA580C"},{i:"⏸",v:10-a.length,l:"ทีมสำรอง",c:"#475569"}]
+    .map(x=>`<div class="stat"><div class="sico" style="background:${x.c}20">${x.i}</div><div><div class="sval">${x.v}</div><div class="slbl">${x.l}</div></div></div>`).join("");
 }
-
-/* ════════════════════════════════════
-   RENDER FILTERS
-════════════════════════════════════ */
 function renderFilters(){
-  const items=[{id:"ALL",label:"ทั้งหมด",color:"#E8F0FE"},...JOB_TYPES];
-  document.getElementById("filters").innerHTML = items.map(j=>{
-    const on = filterType===j.id;
-    return `<button class="fbtn${on?" active":""}"
-      style="${on?`border-color:${j.color};background:${j.color}22;color:${j.color}`:""};"
-      onclick="setFilter('${j.id}')">${j.label}</button>`;
-  }).join("");
+  const items=[{id:"ALL",l:"ทั้งหมด",c:"#E8F0FE"},...JOBS.map(j=>({id:j.id,l:j.l,c:j.c}))];
+  document.getElementById("fi").innerHTML=items.map(j=>{const on=filt===j.id;return`<button class="fb" style="${on?`border-color:${j.c};background:${j.c}22;color:${j.c}`:""}" onclick="setF('${j.id}')">${j.l}</button>`;}).join("");
 }
-
-/* ════════════════════════════════════
-   RENDER CARDS
-════════════════════════════════════ */
 function renderCards(){
-  const filtered = filterType==="ALL" ? teams : teams.filter(t=>t.jobType===filterType);
-  document.getElementById("card-grid").innerHTML = filtered.map(t=>cardHTML(t)).join("");
-}
-
-function cardHTML(t){
-  const p   = PALETTE[t.id-1];
-  const sb  = isStandby(t);
-  const ms  = memberArr(t.members);
-  const jc  = jobColor(t.jobType);
-  const bodyHTML = sb ? `<div class="standby-msg">— ไม่มีงานวันนี้ —</div>` : `
-    <div class="time-row">
-      <div class="time-box" style="background:${p.bg}18">
-        <div class="time-lbl">🚀 ออก</div>
-        <div class="time-val" style="color:${p.bg}">${t.depart||"—"}</div>
+  const list=filt==="ALL"?teams:teams.filter(t=>t.jobType===filt);
+  document.getElementById("cg").innerHTML=list.map(t=>{
+    const p=PAL[t.id-1],sb=isSB(t),ms=mArr(t.members),jcol=jc(t.jobType);
+    const eb=isAdmin?`<button class="ebtn" onclick="event.stopPropagation();openE(${t.id})">✎</button>`:"";
+    const body=sb?`<div class="sbmsg">— ไม่มีงานวันนี้ —</div>`:`
+      <div class="trow">
+        <div class="tbox" style="background:${p.bg}18"><div class="tlbl">🚀 ออก</div><div class="tval" style="color:${p.bg}">${t.depart||"—"}</div></div>
+        <div class="tbox" style="background:${p.bg}18"><div class="tlbl">🏁 ถึง</div><div class="tval" style="color:${p.bg}">${t.arrive||"—"}</div></div>
       </div>
-      <div class="time-box" style="background:${p.bg}18">
-        <div class="time-lbl">🏁 ถึง</div>
-        <div class="time-val" style="color:${p.bg}">${t.arrive||"—"}</div>
+      ${ms.length?`<div class="mems">${ms.map(m=>`<span class="pill" style="background:${p.bg}1A;color:${p.bg};border:1px solid ${p.bg}44">${m}</span>`).join("")}</div>`:""}
+      ${t.vehicle?`<div class="vbox">🚗 <span style="font-weight:600">${t.vehicle}</span></div>`:""}`;
+    return`<div class="card" style="opacity:${sb?.45:1}">
+      <div class="stripe" style="background:${sb?"#1A2840":p.bg}"></div>
+      <div class="chead" style="background:${sb?"#111C2E":p.bg+"18"};border-bottom-color:${sb?"#1A2840":p.bg+"44"}">
+        <div class="cbadge" style="background:${sb?"#1A2840":p.bg}">${p.n}</div>
+        <div style="flex:1;min-width:0"><div class="csite" style="color:${sb?"#546E8A":"#E8F0FE"}">${sb?"— ไม่มีงาน —":t.site}</div><div class="cjn">${t.jobNo||"—"}</div></div>
+        <div style="display:flex;gap:5px;align-items:center;flex-shrink:0"><span class="jtag" style="background:${jcol}28;color:${jcol};border-color:${jcol}55">${jl(t.jobType)}</span>${eb}</div>
       </div>
-    </div>
-    ${ms.length?`<div class="members">${ms.map(m=>`<span class="pill" style="background:${p.bg}1A;color:${p.bg};border:1px solid ${p.bg}44">${m}</span>`).join("")}</div>`:""}
-    ${t.vehicle?`<div class="veh-box"><span>🚗</span><span class="veh-text">${t.vehicle}</span></div>`:""}`;
-
-  return `<div class="card" id="card-${t.id}" onclick="toggleActive(${t.id})" style="opacity:${sb?.45:1}">
-    <div class="card-stripe" style="background:${sb?"#1A2840":p.bg}"></div>
-    <div class="card-head" style="background:${sb?"#111C2E":p.bg+"18"};border-bottom-color:${sb?"#1A2840":p.bg+"44"}">
-      <div class="card-badge" style="background:${sb?"#1A2840":p.bg}">${p.name}</div>
-      <div style="flex:1;min-width:0">
-        <div class="card-site" style="color:${sb?"#546E8A":"#E8F0FE"}">${sb?"— ไม่มีงานวันนี้ —":t.site}</div>
-        <div class="card-jobno">${t.jobNo||"—"}</div>
-      </div>
-      <div class="card-actions">
-        <span class="job-tag" style="background:${jc}28;color:${jc};border-color:${jc}55">${jobLabel(t.jobType)}</span>
-        <button class="edit-btn" onclick="event.stopPropagation();openEdit(${t.id})">✎</button>
-      </div>
-    </div>
-    <div class="card-body">${bodyHTML}</div>
-  </div>`;
-}
-
-function toggleActive(id){
-  const el = document.getElementById("card-"+id);
-  const p  = PALETTE[id-1];
-  const active = el.classList.toggle("active");
-  el.style.borderColor   = active ? p.bg : "var(--border)";
-  el.style.boxShadow     = active ? `0 0 0 1px ${p.bg},0 8px 24px ${p.bg}30` : "";
-  el.style.transform     = active ? "translateY(-2px)" : "";
-}
-
-function setFilter(type){
-  filterType = type;
-  renderFilters();
-  renderCards();
-}
-
-/* ════════════════════════════════════
-   TIMELINE
-════════════════════════════════════ */
-function renderTimeline(){
-  const active = teams.filter(t=>t.depart&&!isStandby(t));
-  const HOURS  = [5,6,7,8,9,10,11,12];
-  const toH    = s=>{ const [h,m]=(s||"").split(":").map(Number); return h+(m||0)/60; };
-  const ticks  = HOURS.map(h=>{
-    const pct = ((h-5)/7)*100;
-    return `<div class="tl-tick" style="left:${pct}%">
-      <div class="tl-tick-line"></div>
-      <div class="tl-tick-lbl">${h}:00</div>
+      <div class="cbody">${body}</div>
     </div>`;
   }).join("");
-  const dots = active.map(t=>{
-    const pct = Math.max(0,Math.min(100,((toH(t.depart)-5)/7)*100));
-    const p   = PALETTE[t.id-1];
-    return `<div class="tl-dot" style="left:${pct}%;background:${p.bg};box-shadow:0 0 0 2px ${p.bg}55" title="${p.name} — ออก ${t.depart}">${t.id}</div>`;
-  }).join("");
-  document.getElementById("timeline").innerHTML = `<div class="tl-line"></div>${ticks}${dots}`;
+}
+function setF(t){filt=t;renderFilters();renderCards();}
+function renderTL(){
+  const act=teams.filter(t=>t.depart&&!isSB(t));
+  const toH=s=>{const[h,m]=(s||"").split(":").map(Number);return h+(m||0)/60;};
+  const HOURS=[5,6,7,8,9,10,11,12];
+  const ticks=HOURS.map(h=>{const p=((h-5)/7)*100;return`<div class="tltick" style="left:${p}%"><div class="tltickl"></div><div class="tltickn">${h}:00</div></div>`;}).join("");
+  const dots=act.map(t=>{const p=Math.max(0,Math.min(100,((toH(t.depart)-5)/7)*100));const pal=PAL[t.id-1];return`<div class="tldot" style="left:${p}%;background:${pal.bg};box-shadow:0 0 0 2px ${pal.bg}44">${t.id}</div>`;}).join("");
+  document.getElementById("tl").innerHTML=`<div class="tlline"></div>${ticks}${dots}`;
 }
 
-/* ════════════════════════════════════
-   EDIT MODAL
-════════════════════════════════════ */
-function openEdit(id){
-  editId = id;
-  const t = teams.find(x=>x.id===id);
-  const p = PALETTE[id-1];
-  editJobType = t.jobType;
-
-  document.getElementById("edit-badge").style.background = p.bg;
-  document.getElementById("edit-badge").textContent = p.name;
-  document.getElementById("edit-title").textContent = `แก้ไขข้อมูล ${p.name}`;
-
-  document.getElementById("f-site").value    = t.site||"";
-  document.getElementById("f-jobno").value   = t.jobNo||"";
-  document.getElementById("f-depart").value  = t.depart||"";
-  document.getElementById("f-arrive").value  = t.arrive||"";
-  document.getElementById("f-members").value = t.members||"";
-  document.getElementById("f-vehicle").value = t.vehicle||"";
-  document.getElementById("f-equip").value   = t.equipment||"";
-  document.getElementById("f-contact").value = t.contact||"";
-
-  renderJTypeBtns();
-  document.getElementById("edit-overlay").style.display = "flex";
+// Edit
+function openE(id){if(!isAdmin)return;eid=id;const t=teams.find(x=>x.id===id),p=PAL[id-1];ejt=t.jobType;
+  document.getElementById("ebg").style.background=p.bg;document.getElementById("ebg").textContent=p.n;
+  document.getElementById("et").textContent="แก้ไข "+p.n;
+  document.getElementById("fs").value=t.site||"";document.getElementById("fj").value=t.jobNo||"";
+  document.getElementById("fd").value=t.depart||"";document.getElementById("fa").value=t.arrive||"";
+  document.getElementById("fm").value=t.members||"";document.getElementById("fv").value=t.vehicle||"";
+  document.getElementById("fe").value=t.equipment||"";document.getElementById("fc").value=t.contact||"";
+  renderJB();document.getElementById("eov").style.display="flex";
 }
-function renderJTypeBtns(){
-  document.getElementById("jtype-row").innerHTML = JOB_TYPES.map(j=>{
-    const on = editJobType===j.id;
-    return `<button class="jtype-btn"
-      style="${on?`border-color:${j.color};background:${j.color}28;color:${j.color}`:""}"
-      onclick="setJType('${j.id}')">${j.label}</button>`;
-  }).join("");
-}
-function setJType(id){ editJobType=id; renderJTypeBtns(); }
-function closeEditModal(){ document.getElementById("edit-overlay").style.display="none"; }
-function closeEdit(e){ if(e.target.id==="edit-overlay") closeEditModal(); }
-function saveEdit(){
-  const idx = teams.findIndex(t=>t.id===editId);
-  teams[idx] = {
-    ...teams[idx],
-    jobType:   editJobType,
-    site:      document.getElementById("f-site").value.trim(),
-    jobNo:     document.getElementById("f-jobno").value.trim(),
-    depart:    document.getElementById("f-depart").value,
-    arrive:    document.getElementById("f-arrive").value,
-    members:   document.getElementById("f-members").value.trim(),
-    vehicle:   document.getElementById("f-vehicle").value.trim(),
-    equipment: document.getElementById("f-equip").value.trim(),
-    contact:   document.getElementById("f-contact").value.trim(),
-  };
-  saveData();
-  closeEditModal();
-  renderAll();
-  showToast(`✅ บันทึก ${PALETTE[editId-1].name} เรียบร้อย`);
+function renderJB(){document.getElementById("jtr").innerHTML=JOBS.map(j=>{const on=ejt===j.id;return`<button class="jb" style="${on?`border-color:${j.c};background:${j.c}28;color:${j.c}`:""}" onclick="setJT('${j.id}')">${j.l}</button>`;}).join("");}
+function setJT(id){ejt=id;renderJB();}
+function closeE(){document.getElementById("eov").style.display="none";}
+function saveE(){
+  const i=teams.findIndex(t=>t.id===eid);
+  teams[i]={...teams[i],jobType:ejt,site:document.getElementById("fs").value.trim(),jobNo:document.getElementById("fj").value.trim(),
+    depart:document.getElementById("fd").value,arrive:document.getElementById("fa").value,
+    members:document.getElementById("fm").value.trim(),vehicle:document.getElementById("fv").value.trim(),
+    equipment:document.getElementById("fe").value.trim(),contact:document.getElementById("fc").value.trim()};
+  closeE();dirty=true;document.getElementById("sf").style.display="flex";
+  renderAll();toast("✅ แก้ไข "+PAL[eid-1].n+" แล้ว — กด Save & Sync","warn");
 }
 
-/* ════════════════════════════════════
-   EXCEL IMPORT
-════════════════════════════════════ */
-document.getElementById("xl-input").addEventListener("change", function(e){
-  const f = e.target.files[0]; if(!f) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try{
-      const wb   = XLSX.read(ev.target.result,{type:"binary"});
-      const ws   = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(ws,{header:1,defval:""});
-      const mapped = rows.slice(1).slice(0,10).map((r,i)=>({
-        id: i+1,
-        jobType:   String(r[1]||"STANDBY").toUpperCase().replace(" ","_"),
-        site:      String(r[2]||""),
-        jobNo:     String(r[3]||""),
-        depart:    String(r[4]||""),
-        arrive:    String(r[5]||""),
-        members:   String(r[6]||""),
-        vehicle:   String(r[7]||""),
-        equipment: String(r[8]||""),
-        contact:   String(r[9]||""),
-      }));
-      while(mapped.length<10) mapped.push({id:mapped.length+1,jobType:"STANDBY",site:"",jobNo:"",depart:"",arrive:"",members:"",vehicle:"",equipment:"",contact:""});
-      teams = mapped;
-      saveData();
-      renderAll();
-      showToast(`✅ Import สำเร็จ ${mapped.filter(t=>t.site).length} ทีม`);
-    }catch(err){ showToast("❌ Import ไม่สำเร็จ: "+err.message, true); }
-  };
-  reader.readAsBinaryString(f);
-  e.target.value="";
+// Excel
+document.getElementById("xli").addEventListener("change",function(e){
+  if(!isAdmin)return;const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{try{
+    const wb=XLSX.read(ev.target.result,{type:"binary"}),ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:""});
+    const m=rows.slice(1).slice(0,10).map((r,i)=>({id:i+1,jobType:String(r[1]||"STANDBY").toUpperCase().replace(" ","_"),site:String(r[2]||""),jobNo:String(r[3]||""),depart:String(r[4]||""),arrive:String(r[5]||""),members:String(r[6]||""),vehicle:String(r[7]||""),equipment:String(r[8]||""),contact:String(r[9]||"")}));
+    while(m.length<10)m.push({id:m.length+1,jobType:"STANDBY",site:"",jobNo:"",depart:"",arrive:"",members:"",vehicle:"",equipment:"",contact:""});
+    teams=m;dirty=true;document.getElementById("sf").style.display="flex";renderAll();
+    toast("✅ Import "+m.filter(t=>t.site).length+" ทีม — กด Save & Sync");
+  }catch(err){toast("❌ Import ไม่สำเร็จ","err");}};
+  r.readAsBinaryString(f);e.target.value="";
 });
+function resetD(){if(!confirm("โหลดข้อมูลใหม่จาก cloud?"))return;dirty=false;document.getElementById("sf").style.display="none";loadCloud();}
 
-/* ════════════════════════════════════
-   GOOGLE DRIVE BACKUP
-════════════════════════════════════ */
-const CLIENT_ID     = "YOUR_GOOGLE_CLIENT_ID";   // ← ใส่ Client ID จาก Google Cloud Console
-const SCOPES        = "https://www.googleapis.com/auth/drive.file";
-const DRIVE_FOLDER  = "DispatchBoard";
-let   gAccessToken  = null;
-let   gUserEmail    = "";
-
-function openDriveModal(){
-  document.getElementById("drive-overlay").style.display = "flex";
-  if(gAccessToken){
-    document.getElementById("drive-auth-section").style.display  = "none";
-    document.getElementById("drive-signed-section").style.display = "block";
-    document.getElementById("drive-user-email").textContent = gUserEmail;
-  }
-}
-function closeDriveModal(e){
-  if(e.target.id==="drive-overlay")
-    document.getElementById("drive-overlay").style.display = "none";
-}
-
-function signInGoogle(){
-  if(typeof google === "undefined"){
-    showToast("⚠️ ต้องใส่ Google Client ID ก่อน — ดูคำแนะนำใน hint ด้านล่าง", true);
-    return;
-  }
-  const client = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: SCOPES,
-    callback: resp => {
-      if(resp.error){ showToast("❌ Sign in ไม่สำเร็จ", true); return; }
-      gAccessToken = resp.access_token;
-      // get user info
-      fetch("https://www.googleapis.com/oauth2/v3/userinfo",{
-        headers:{Authorization:"Bearer "+gAccessToken}
-      }).then(r=>r.json()).then(info=>{
-        gUserEmail = info.email||"";
-        document.getElementById("drive-auth-section").style.display   = "none";
-        document.getElementById("drive-signed-section").style.display  = "block";
-        document.getElementById("drive-user-email").textContent = gUserEmail;
-        showToast("✅ Sign in สำเร็จ: "+gUserEmail);
-      });
-    }
-  });
-  client.requestAccessToken();
-}
-
-function signOutGoogle(){
-  gAccessToken = null; gUserEmail = "";
-  document.getElementById("drive-auth-section").style.display   = "block";
-  document.getElementById("drive-signed-section").style.display  = "none";
-  showToast("🚪 Sign out เรียบร้อย");
-}
-
-async function getOrCreateFolder(){
-  // search existing folder
-  const q    = `name='${DRIVE_FOLDER}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
-  const resp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)`,
-    {headers:{Authorization:"Bearer "+gAccessToken}});
-  const data = await resp.json();
-  if(data.files&&data.files.length>0) return data.files[0].id;
-  // create
-  const cr = await fetch("https://www.googleapis.com/drive/v3/files",{
-    method:"POST",
-    headers:{Authorization:"Bearer "+gAccessToken,"Content-Type":"application/json"},
-    body: JSON.stringify({name:DRIVE_FOLDER,mimeType:"application/vnd.google-apps.folder"})
-  });
-  const cf = await cr.json();
-  return cf.id;
-}
-
-async function backupToDrive(){
-  if(!gAccessToken){ showToast("❌ กรุณา Sign in ก่อน",true); return; }
-  showToast("⏳ กำลัง backup...");
-  try{
-    const folderId = await getOrCreateFolder();
-    const d = new Date();
-    const fname = `Dispatch_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}_${String(d.getHours()).padStart(2,"0")}${String(d.getMinutes()).padStart(2,"0")}.json`;
-    const blob  = new Blob([JSON.stringify({version:1,date:d.toISOString(),teams},null,2)],{type:"application/json"});
-
-    const meta  = JSON.stringify({name:fname,parents:[folderId]});
-    const form  = new FormData();
-    form.append("metadata",new Blob([meta],{type:"application/json"}));
-    form.append("file",blob);
-
-    const r = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
-      {method:"POST",headers:{Authorization:"Bearer "+gAccessToken},body:form});
-    const f = await r.json();
-    if(f.id) showToast(`☁️ Backup สำเร็จ: ${fname}`);
-    else     showToast("❌ Backup ไม่สำเร็จ",true);
-  }catch(err){ showToast("❌ "+err.message,true); }
-}
-
-async function loadDriveFiles(){
-  if(!gAccessToken){ showToast("❌ กรุณา Sign in ก่อน",true); return; }
-  try{
-    const folderId = await getOrCreateFolder();
-    const q  = `'${folderId}' in parents and name contains 'Dispatch_' and trashed=false`;
-    const r  = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&orderBy=createdTime+desc&fields=files(id,name,createdTime)&pageSize=10`,
-      {headers:{Authorization:"Bearer "+gAccessToken}});
-    const d  = await r.json();
-    const files = d.files||[];
-    const el = document.getElementById("drive-files-list");
-    if(!files.length){ el.innerHTML=`<div style="color:var(--muted);font-size:11px;padding:8px">ยังไม่มีไฟล์สำรอง</div>`; return; }
-    el.innerHTML = files.map(f=>`
-      <div class="drive-file" onclick="restoreFromDrive('${f.id}','${f.name}')">
-        <div class="drive-file-icon">📄</div>
-        <div class="drive-file-name">${f.name}</div>
-        <div class="drive-file-date">${new Date(f.createdTime).toLocaleString("th-TH",{dateStyle:"short",timeStyle:"short"})}</div>
-      </div>`).join("");
-  }catch(err){ showToast("❌ "+err.message,true); }
-}
-
-async function restoreFromDrive(fileId, fname){
-  if(!confirm(`กู้คืนข้อมูลจาก ${fname}?\n(ข้อมูลปัจจุบันจะถูกแทนที่)`)) return;
-  try{
-    const r = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
-      {headers:{Authorization:"Bearer "+gAccessToken}});
-    const data = await r.json();
-    if(data.teams){ teams=data.teams; saveData(); renderAll(); showToast(`✅ กู้คืนจาก ${fname} สำเร็จ`); }
-    document.getElementById("drive-overlay").style.display="none";
-  }catch(err){ showToast("❌ "+err.message,true); }
-}
-
-/* ════════════════════════════════════
-   PRINT
-════════════════════════════════════ */
+// Print
 function openPrint(){
-  const active = teams.filter(t=>!isStandby(t));
-  const pax    = active.reduce((s,t)=>s+memberArr(t.members).length,0);
-  const rows   = active.map((t,i)=>{
-    const p  = PALETTE[t.id-1];
-    const jc = jobColor(t.jobType);
-    return `<tr>
-      <td><span class="p-badge" style="background:${p.bg}">${p.name}</span></td>
-      <td><span class="p-job" style="background:${jc}20;color:${jc};border-color:${jc}55">${jobLabel(t.jobType)}</span></td>
-      <td style="font-weight:600">${t.site}</td>
-      <td style="font-family:monospace;color:#1D4ED8">${t.jobNo}</td>
-      <td style="font-family:monospace;font-weight:700;color:#DC2626">${t.depart||"—"}</td>
-      <td style="font-family:monospace;font-weight:700;color:#16A34A">${t.arrive||"—"}</td>
-      <td>${t.members||"—"}</td>
-      <td style="font-size:10px">${t.vehicle||"—"}</td>
-      <td style="font-size:10px">${t.equipment||"—"}</td>
-      <td style="font-size:10px">${t.contact||"—"}</td>
-    </tr>`;
-  }).join("");
-
-  document.getElementById("print-area").innerHTML = `
-    <div class="print-header">
-      <div>
-        <div class="print-h1">🏗 DAILY DISPATCH — BRIEFING SHEET</div>
-        <div class="print-sub">AIT &amp; Services Co., Ltd.  ·  Manpower Daily Planning</div>
-      </div>
-      <div class="print-dr">
-        <div class="d1">${thaiDate()}</div>
-        <div class="d2">${new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}</div>
-      </div>
+  const act=teams.filter(t=>!isSB(t)),pax=act.reduce((s,t)=>s+mArr(t.members).length,0);
+  document.getElementById("pa").innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;border-bottom:3px solid #0B1120;padding-bottom:11px;">
+      <div><div style="font-size:19px;font-weight:900">🏗 DAILY DISPATCH — BRIEFING SHEET</div><div style="font-size:12px;color:#64748B;margin-top:3px">AIT &amp; Services · Manpower Daily Planning</div></div>
+      <div style="text-align:right"><div style="font-size:14px;font-weight:800">${thd()}</div><div style="font-size:11px;color:#64748B">${new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}</div></div>
     </div>
-    <div class="print-stats">
-      ${[["ทีมออกงาน",active.length,"#1D4ED8"],["กำลังพลรวม",pax,"#0D9488"],["Total Jobs",active.length,"#7C3AED"]].map(([l,v,c])=>`
-        <div class="print-stat" style="border:2px solid ${c}">
-          <div class="sv" style="color:${c}">${v}</div>
-          <div class="sl">${l}</div>
-        </div>`).join("")}
+    <div style="display:flex;gap:11px;margin-bottom:18px">
+      ${[["ทีมออกงาน",act.length,"#1D4ED8"],["กำลังพลรวม",pax,"#0D9488"],["Total Jobs",act.length,"#7C3AED"]].map(([l,v,c])=>`<div style="flex:1;border:2px solid ${c};border-radius:9px;padding:10px;text-align:center"><div style="font-size:24px;font-weight:900;color:${c}">${v}</div><div style="font-size:11px;color:#64748B">${l}</div></div>`).join("")}
     </div>
-    <table class="print-table">
-      <thead><tr>${["ทีม","ประเภท","Site / ลูกค้า","Job No.","ออก","ถึง","ทีมงาน","รถ","เครื่องมือ","ติดต่อ"].map(h=>`<th>${h}</th>`).join("")}</tr></thead>
-      <tbody>${rows}</tbody>
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr style="background:#0B1120">${["ทีม","ประเภท","Site","Job No.","ออก","ถึง","ทีมงาน","รถ","เครื่องมือ","ติดต่อ"].map(h=>`<th style="color:#fff;padding:7px 8px;text-align:left;font-size:10px">${h}</th>`).join("")}</tr></thead>
+      <tbody>${act.map((t,i)=>{const p=PAL[t.id-1];const jcol=jc(t.jobType);return`<tr style="background:${i%2===0?"#F8FAFC":"#fff"}"><td style="padding:6px 8px"><span style="background:${p.bg};color:#fff;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:800;font-family:monospace">${p.n}</span></td><td style="padding:6px 8px"><span style="background:${jcol}20;color:${jcol};border:1px solid ${jcol}55;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:800;font-family:monospace">${jl(t.jobType)}</span></td><td style="padding:6px 8px;font-weight:600">${t.site}</td><td style="padding:6px 8px;font-family:monospace;color:#1D4ED8">${t.jobNo}</td><td style="padding:6px 8px;font-family:monospace;font-weight:700;color:#DC2626">${t.depart||"—"}</td><td style="padding:6px 8px;font-family:monospace;font-weight:700;color:#16A34A">${t.arrive||"—"}</td><td style="padding:6px 8px">${t.members||"—"}</td><td style="padding:6px 8px;font-size:10px">${t.vehicle||"—"}</td><td style="padding:6px 8px;font-size:10px">${t.equipment||"—"}</td><td style="padding:6px 8px;font-size:10px">${t.contact||"—"}</td></tr>`;}).join("")}</tbody>
     </table>
-    <div class="print-sig">
-      ${["จัดทำโดย","ตรวจสอบโดย","อนุมัติโดย"].map(r=>`
-        <div class="sig-line"><div class="line"></div><div class="lbl">${r}</div></div>`).join("")}
+    <div style="margin-top:32px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px">
+      ${["จัดทำโดย","ตรวจสอบโดย","อนุมัติโดย"].map(r=>`<div style="text-align:center"><div style="border-bottom:1px solid #0B1120;margin-bottom:5px;padding-bottom:26px"></div><div style="font-size:11px;color:#64748B">${r}</div></div>`).join("")}
     </div>
-    <div class="print-footer">AIT &amp; Services Co., Ltd.  ·  Daily Dispatch Board  ·  ${new Date().toLocaleString("th-TH")}</div>`;
-
-  document.getElementById("print-overlay").classList.add("show");
-}
-function closePrint(){ document.getElementById("print-overlay").classList.remove("show"); }
-
-/* ════════════════════════════════════
-   RENDER ALL
-════════════════════════════════════ */
-function renderAll(){
-  renderStats();
-  renderFilters();
-  renderCards();
-  renderTimeline();
+    <div style="margin-top:16px;font-size:9px;color:#94A3B8;text-align:center">AIT &amp; Services Co., Ltd. · Daily Dispatch Board · ${new Date().toLocaleString("th-TH")}</div>`;
+  document.getElementById("pov").classList.add("show");
 }
 
-/* ════════════════════════════════════
-   INIT
-════════════════════════════════════ */
-initDate();
-loadData();
-renderAll();
+// Init
+document.getElementById("nth").textContent=thd();
+document.getElementById("nen").textContent=new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
+loadCloud();
+startRefresh();
 </script>
 </body>
 </html>
