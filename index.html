@@ -77,20 +77,19 @@ body { font-family: var(--ff); background: var(--bg); color: var(--text); font-s
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 0.5px solid var(--border);
-  height: 54px;
+  height: 56px;
   display: flex; align-items: center; padding: 0 20px; gap: 14px;
 }
 .nav-logo {
-  height: 30px; object-fit: contain;
+  height: 36px; object-fit: contain; flex-shrink: 0;
   transition: filter .3s;
-  /* Dark mode: PNG has black bg — make it white/visible via invert */
-  filter: brightness(0) invert(1);
+  /* Dark mode: invert black→white, keep blue arc → bright white logo */
+  filter: brightness(0) invert(1) drop-shadow(0 0 2px rgba(255,255,255,.2));
 }
 [data-theme="light"] .nav-logo {
-  /* Light mode: show AIT blue color */
-  filter: brightness(0) saturate(100%)
-    invert(30%) sepia(90%) saturate(500%)
-    hue-rotate(190deg) brightness(100%) contrast(100%);
+  /* Light mode: keep blue crescent + dark text visible on white nav */
+  filter: brightness(0.05) saturate(1) contrast(1.2)
+          drop-shadow(0 0 1px rgba(0,0,0,.15));
 }
 .nav-divider { width: 1px; height: 20px; background: var(--border); }
 .nav-title { font-size: 15px; font-weight: 600; color: var(--text); }
