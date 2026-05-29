@@ -11,71 +11,75 @@
 :root{
   --ff:'Tahoma','Arial',sans-serif;
   --navy:#1a2332;--slate:#2d3f55;--mid:#4a6080;--muted:#7a92ab;
-  --border:#d4dce6;--bg:#f5f7fa;--white:#ffffff;
+  --border:#d4dce6;--bg:#f0f3f7;--white:#fff;
   --accent:#2563eb;--accent-lt:#eff4ff;
   --green:#16a34a;--green-lt:#f0fdf4;
-  --orange:#ea580c;--orange-lt:#fff7ed;
-  --red:#dc2626;--red-lt:#fef2f2;
-  --gray3:#e8ecf0;--gray2:#f0f3f7;
+  --orange:#ea580c;--red:#dc2626;--red-lt:#fef2f2;
+  --purple:#7c3aed;--teal:#0d9488;--amber:#b45309;
+  --gray3:#e8ecf0;--gray2:#f5f7fa;--warn-bg:#fffbeb;--warn-c:#b45309;
 }
 body{font-family:var(--ff);background:var(--bg);color:var(--navy);font-size:13px;line-height:1.5}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-thumb{background:#c8d4e0;border-radius:9px}
 
 /* NAV */
-.nav{background:var(--navy);height:50px;display:flex;align-items:center;padding:0 18px;gap:12px;position:sticky;top:0;z-index:100}
+.nav{background:var(--navy);height:50px;display:flex;align-items:center;padding:0 18px;gap:12px;position:sticky;top:0;z-index:300}
 .nav-logo{width:32px;height:32px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .nav-logo svg{width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round}
-.nav-title{font-weight:700;font-size:15px;color:#fff;letter-spacing:.3px}
-.nav-sub{font-size:10px;color:#6a8aaa;letter-spacing:.2px}
+.nav-brand{font-weight:700;font-size:15px;color:#fff}
+.nav-sub{font-size:10px;color:#6a8aaa}
 .sp{flex:1}
-.nav-date .d1{font-size:12px;font-weight:700;color:#fff;text-align:right}
-.nav-date .d2{font-size:10px;color:#6a8aaa;text-align:right}
+.nd .d1{font-size:12px;font-weight:700;color:#fff;text-align:right}
+.nd .d2{font-size:10px;color:#6a8aaa;text-align:right}
 .nbtn{border:1px solid #354f6a;background:transparent;color:#c0d0e0;font-family:var(--ff);font-size:11px;font-weight:700;border-radius:5px;padding:5px 12px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:all .12s}
 .nbtn:hover{background:#2d3f55;color:#fff}
 .nbtn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
 .nbtn.pri:hover{background:#1d4ed8}
+.nbtn.grn{background:var(--green);border-color:var(--green);color:#fff}
+
+/* TAB BAR */
+.tabs{background:#fff;border-bottom:1px solid var(--border);display:flex;padding:0 18px;gap:0}
+.tab{padding:11px 16px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .12s;white-space:nowrap}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tab:hover:not(.on){color:var(--slate)}
 
 /* SYNC BAR */
 .sbar{background:#fff;border-bottom:1px solid var(--border);padding:5px 18px;display:flex;align-items:center;gap:9px;font-size:11px}
-.sdot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 4px #16a34a66;flex-shrink:0}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
 .sdot.sync{background:#f59e0b;animation:pu 1s infinite}
 .sdot.err{background:var(--red)}
 @keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
 .stxt{color:var(--muted);flex:1}
-.mbadge{padding:2px 10px;border-radius:99px;font-size:10px;font-weight:700;background:var(--gray3);color:var(--mid);letter-spacing:.3px}
+.mbadge{padding:2px 10px;border-radius:99px;font-size:10px;font-weight:700;background:var(--gray3);color:var(--mid)}
 .mbadge.edit{background:var(--accent-lt);color:var(--accent);border:1px solid #bfdbfe}
 
-/* IMPORT BAR */
-.ibar{display:none;background:var(--gray2);border-bottom:1px solid var(--border);padding:7px 18px;gap:8px}
+/* WARNING BANNER */
+.warn-banner{display:none;background:var(--warn-bg);border-bottom:1px solid #fcd34d;padding:6px 18px;font-size:11px;color:var(--warn-c);font-weight:700;gap:8px;align-items:center}
+.warn-banner.show{display:flex}
 
 /* TOAST */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 20px;border-radius:7px;font-weight:700;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;white-space:nowrap;box-shadow:0 4px 16px rgba(26,35,50,.3)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;padding:9px 20px;border-radius:7px;font-weight:700;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;white-space:nowrap;font-family:var(--ff)}
 .toast.show{opacity:1}
 .toast.ok{background:var(--green)}
 .toast.err{background:var(--red)}
-.toast.warn{background:#b45309}
+.toast.warn{background:var(--amber)}
+.toast.info{background:var(--navy)}
 
-/* MAIN */
-.main{padding:14px 18px 60px;max-width:1400px;margin:0 auto}
+/* PAGES */
+.page{display:none}.page.on{display:block}
 
-/* STATS */
+/* ── DISPATCH PAGE ── */
+.main{padding:14px 18px 80px;max-width:1400px;margin:0 auto}
 .stats{display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap}
 .stat{background:#fff;border:1px solid var(--border);border-radius:7px;padding:11px 14px;display:flex;align-items:center;gap:11px;flex:1;min-width:100px}
 .stat-ic{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .stat-val{font-size:22px;font-weight:700;line-height:1;color:var(--navy)}
 .stat-lbl{font-size:10px;color:var(--muted);margin-top:2px}
-
-/* FILTERS */
 .filters{display:flex;gap:5px;margin-bottom:13px;flex-wrap:wrap}
-.fb{padding:4px 12px;border-radius:4px;border:1px solid var(--border);background:#fff;color:var(--mid);font-family:var(--ff);font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.4px;transition:all .1s}
+.fb{padding:4px 12px;border-radius:4px;border:1px solid var(--border);background:#fff;color:var(--mid);font-family:var(--ff);font-size:10px;font-weight:700;cursor:pointer;transition:all .1s}
 .fb.on{background:var(--navy);border-color:var(--navy);color:#fff}
 .fb:hover:not(.on){background:var(--gray3)}
-
-/* GRID */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:9px;margin-bottom:14px}
-
-/* CARD */
 .card{background:#fff;border:1px solid var(--border);border-radius:7px;overflow:hidden;transition:box-shadow .12s,transform .1s}
 .card:hover{box-shadow:0 3px 10px rgba(26,35,50,.09);transform:translateY(-1px)}
 .card-accent{height:3px}
@@ -83,18 +87,20 @@ body{font-family:var(--ff);background:var(--bg);color:var(--navy);font-size:13px
 .ctid{width:27px;height:27px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;color:#fff;flex-shrink:0}
 .csite{font-weight:700;font-size:12px;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .cjn{font-size:10px;color:var(--muted)}
-.jpill{font-size:9px;font-weight:700;letter-spacing:.5px;padding:2px 6px;border-radius:3px;border:1px solid transparent;flex-shrink:0}
+.jpill{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;border:1px solid transparent;flex-shrink:0}
 .eic{width:24px;height:24px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;flex-shrink:0;transition:background .1s;font-family:var(--ff)}
 .eic:hover{background:var(--gray3);color:var(--navy)}
+.warn-ic{width:20px;height:20px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
 .card-body{padding:10px 11px;display:flex;flex-direction:column;gap:6px}
 .trow{display:flex;gap:6px}
 .tbox{flex:1;border-radius:5px;padding:5px 0;text-align:center}
-.tlbl{font-size:9px;color:var(--muted);letter-spacing:.2px}
+.tlbl{font-size:9px;color:var(--muted)}
 .tval{font-size:14px;font-weight:700}
 .mem-row{display:flex;flex-wrap:wrap;gap:3px}
 .pill{border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;white-space:nowrap}
-.veh{background:var(--gray2);border-radius:5px;padding:5px 9px;font-size:10px;display:flex;align-items:center;gap:5px;color:var(--slate)}
+.veh{background:var(--gray2);border-radius:5px;padding:5px 9px;font-size:10px;display:flex;align-items:center;gap:5px}
 .veh b{font-weight:700}
+.warn-pill{font-size:9px;background:#fef3c7;color:#b45309;border-radius:3px;padding:1px 5px;font-weight:700}
 .sbmsg{color:var(--muted);font-size:11px;text-align:center;padding:10px 0}
 
 /* TIMELINE */
@@ -107,55 +113,62 @@ body{font-family:var(--ff);background:var(--bg);color:var(--navy);font-size:13px
 .tlticn{font-size:9px;color:var(--muted);margin-top:3px;transform:translateX(-50%);font-family:var(--ff)}
 .tldot{position:absolute;top:10px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;border:2px solid var(--bg);z-index:1;transform:translateX(-50%)}
 
-/* HINT */
-.hint{background:#fff;border:1px solid var(--border);border-radius:7px;padding:9px 13px;font-size:11px;color:var(--muted)}
-.hint b{color:var(--slate)}
-.hint code{color:var(--accent);font-family:monospace;font-size:10px}
+/* ── HISTORY PAGE ── */
+.hist-main{padding:14px 18px 80px;max-width:900px;margin:0 auto}
+.hist-day{background:#fff;border:1px solid var(--border);border-radius:7px;margin-bottom:10px;overflow:hidden}
+.hist-day-head{padding:10px 14px;background:var(--gray2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.hist-day-title{font-weight:700;font-size:13px;color:var(--navy)}
+.hist-day-meta{font-size:11px;color:var(--muted)}
+.hist-table{width:100%;border-collapse:collapse;font-size:11px}
+.hist-table th{background:var(--gray3);color:var(--mid);padding:7px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.3px}
+.hist-table td{padding:7px 10px;border-bottom:0.5px solid var(--border);vertical-align:top}
+.hist-table tr:last-child td{border-bottom:none}
+.hist-table tr:hover td{background:#f8fafc}
 
-/* FLOAT SAVE */
-.sfloat{position:fixed;bottom:20px;right:20px;z-index:200;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;box-shadow:0 4px 20px rgba(26,35,50,.14);display:none;align-items:center;gap:10px}
-.sfloat.show{display:flex}
+/* ── REPORT PAGE ── */
+.rep-main{padding:14px 18px 80px;max-width:900px;margin:0 auto}
+.rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.rep-card{background:#fff;border:1px solid var(--border);border-radius:7px;padding:14px 16px}
+.rep-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.rep-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px}
+.rep-bar-lbl{width:90px;color:var(--mid);flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rep-bar-wrap{flex:1;height:8px;background:var(--gray3);border-radius:4px;overflow:hidden}
+.rep-bar{height:100%;border-radius:4px}
+.rep-bar-val{width:28px;text-align:right;font-weight:700;color:var(--slate);flex-shrink:0}
 
 /* ── MODAL ── */
 .ov{position:fixed;inset:0;background:rgba(26,35,50,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(3px)}
 .ov.open{display:flex}
-.modal{background:#fff;border-radius:10px;width:100%;max-width:500px;overflow:hidden;border:1px solid var(--border);box-shadow:0 16px 48px rgba(26,35,50,.18);max-height:92vh;display:flex;flex-direction:column}
-.mhead{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.modal{background:#fff;border-radius:10px;width:100%;max-width:500px;overflow:hidden;border:1px solid var(--border);box-shadow:0 16px 48px rgba(26,35,50,.18);max-height:94vh;display:flex;flex-direction:column}
+.mhead{padding:13px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);flex-shrink:0}
 .mbg{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0}
 .mt{font-weight:700;font-size:14px;color:var(--navy)}
 .ms{font-size:11px;color:var(--muted);margin-top:1px}
 .xbtn{margin-left:auto;width:28px;height:28px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;transition:background .1s;font-family:var(--ff)}
 .xbtn:hover{background:var(--gray3);color:var(--navy)}
 .mbody{padding:14px 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:11px}
-
-/* Job type row */
 .jtr{display:flex;gap:5px;flex-wrap:wrap}
-.jt{padding:5px 11px;border-radius:4px;border:1.5px solid var(--border);background:#fff;font-family:var(--ff);font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.4px;transition:all .1s}
+.jt{padding:5px 11px;border-radius:4px;border:1.5px solid var(--border);background:#fff;font-family:var(--ff);font-size:10px;font-weight:700;cursor:pointer;transition:all .1s}
 .jt:hover:not(.on){background:var(--gray3)}
-
-/* FORM */
 .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.fg{display:flex;flex-direction:column;gap:3px}
-.fg.full{grid-column:1/-1}
+.fg{display:flex;flex-direction:column;gap:3px}.fg.full{grid-column:1/-1}
 .flbl{font-size:10px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.4px}
 .fi,.fsel{width:100%;border:1px solid var(--border);border-radius:5px;color:var(--navy);font-size:12px;padding:7px 10px;font-family:var(--ff);outline:none;background:#fff;appearance:none;-webkit-appearance:none;transition:border .12s}
 .fi:focus,.fsel:focus{border-color:var(--accent);box-shadow:0 0 0 2px #2563eb18}
-.selw{position:relative}
-.selw::after{content:"▾";position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:11px;pointer-events:none}
-
-/* Member pills area */
+.fi.err,.fsel.err{border-color:var(--red)}
+.selw{position:relative}.selw::after{content:"▾";position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:11px;pointer-events:none}
+.warn-msg{font-size:10px;color:var(--red);margin-top:2px}
 .mem-area{min-height:32px;display:flex;flex-wrap:wrap;gap:4px;padding:5px 8px;border:1px solid var(--border);border-radius:5px;background:#fafbfc}
-.mem-pill{border-radius:3px;padding:2px 7px 2px 8px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;transition:opacity .1s}
-.mem-pill:hover{opacity:.75}
-.mem-pill .rm{font-size:13px;line-height:1;margin-top:-1px}
-
+.mem-pill2{border-radius:3px;padding:2px 7px 2px 8px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px}
+.mem-pill2:hover{opacity:.75}
 .mfoot{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0}
 .mbtn{font-family:var(--ff);font-size:12px;font-weight:700;border-radius:5px;padding:7px 16px;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--slate);transition:all .1s}
 .mbtn:hover{background:var(--gray3)}
 .mbtn.pri{background:var(--navy);border-color:var(--navy);color:#fff}
 .mbtn.pri:hover{background:var(--slate)}
+.mbtn.grn{background:var(--green);border-color:var(--green);color:#fff}
 
-/* PIN MODAL */
+/* PIN */
 .pmod{background:#fff;border-radius:10px;width:100%;max-width:320px;border:1px solid var(--border);padding:28px 24px;text-align:center;box-shadow:0 16px 48px rgba(26,35,50,.18)}
 .pico{font-size:32px;margin-bottom:10px}
 .pt1{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:4px}
@@ -164,8 +177,12 @@ body{font-family:var(--ff);background:var(--bg);color:var(--navy);font-size:13px
 .pi:focus{border-color:var(--accent)}
 .perr{color:var(--red);font-size:11px;margin-top:6px;min-height:16px}
 
-/* SETUP MODAL */
+/* SETUP */
 .smod{background:#fff;border-radius:10px;width:100%;max-width:400px;border:1px solid var(--border);overflow:hidden;box-shadow:0 16px 48px rgba(26,35,50,.18)}
+
+/* SAVE FLOAT */
+.sfloat{position:fixed;bottom:20px;right:20px;z-index:200;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;box-shadow:0 4px 20px rgba(26,35,50,.14);display:none;align-items:center;gap:10px}
+.sfloat.show{display:flex}
 
 /* PRINT */
 #pov{display:none;position:fixed;inset:0;background:#fff;z-index:3000;overflow-y:auto}
@@ -173,17 +190,16 @@ body{font-family:var(--ff);background:var(--bg);color:var(--navy);font-size:13px
 .pbar{background:var(--navy);padding:10px 18px;display:flex;align-items:center;gap:10px}
 .pbar span{color:#fff;font-weight:700;font-size:13px}
 
+/* NOTIFICATION BANNER */
+.noti-bar{display:none;background:#1e3a8a;border-bottom:1px solid #1d4ed8;padding:8px 18px;font-size:11px;color:#bfdbfe;gap:10px;align-items:center}
+.noti-bar.show{display:flex}
+
 @media(max-width:600px){
-  .fgrid{grid-template-columns:1fr}
-  .fg.full{grid-column:1}
-  .nav-date{display:none}
-  .nbtn span{display:none}
+  .fgrid{grid-template-columns:1fr}.fg.full{grid-column:1}
+  .nd{display:none}.rep-grid{grid-template-columns:1fr}
+  .nbtn span.hs{display:none}
 }
-@media print{
-  .pbar,.nopr{display:none!important}
-  #pa{padding:14px 18px;max-width:100%}
-  body{background:#fff}
-}
+@media print{.pbar,.nopr{display:none!important}#pa{padding:14px 18px;max-width:100%}body{background:#fff}}
 </style>
 </head>
 <body>
@@ -195,34 +211,90 @@ body{font-family:var(--ff);background:var(--bg);color:var(--navy);font-size:13px
   <div class="nav-logo">
     <svg viewBox="0 0 17 17"><rect x="1" y="2" width="15" height="3" rx="1.2"/><rect x="1" y="7" width="10" height="2" rx="1"/><rect x="1" y="11.5" width="12" height="2" rx="1"/></svg>
   </div>
-  <div><div class="nav-title">AITs Dashboard</div><div class="nav-sub">Daily Dispatch Board · AIT &amp; Services Co., Ltd.</div></div>
+  <div><div class="nav-brand">AITs Dashboard</div><div class="nav-sub">Daily Dispatch · AIT &amp; Services Co., Ltd.</div></div>
   <div class="sp"></div>
-  <div class="nav-date"><div class="d1" id="nth"></div><div class="d2" id="nen"></div></div>
-  <button class="nbtn" onclick="openPrint()"><span>&#128438;</span><span>Print</span></button>
-  <button class="nbtn" id="ibtn" style="display:none" onclick="document.getElementById('xlf').click()"><span>&#128229;</span><span>Import</span></button>
-  <button class="nbtn pri" id="mbtn" onclick="toggleMode()"><span>&#128274;</span><span id="mlbl">Admin</span></button>
+  <div class="nd"><div class="d1" id="nth"></div><div class="d2" id="nen"></div></div>
+  <button class="nbtn" onclick="openPrint()">&#128438; <span class="hs">Print</span></button>
+  <button class="nbtn" id="ibtn" style="display:none" onclick="document.getElementById('xlf').click()">&#128229; <span class="hs">Import</span></button>
+  <button class="nbtn pri" id="mbtn" onclick="toggleMode()">&#128274; <span id="mlbl">Admin</span></button>
   <input type="file" id="xlf" accept=".xlsx,.xls" style="display:none">
 </nav>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab on" onclick="showTab('dispatch',this)">&#128640; แผนงานวันนี้</div>
+  <div class="tab" onclick="showTab('history',this)">&#128337; ประวัติย้อนหลัง</div>
+  <div class="tab" onclick="showTab('report',this)">&#128202; รายงานสรุป</div>
+</div>
 
 <!-- SYNC BAR -->
 <div class="sbar">
   <div class="sdot" id="sd"></div>
-  <span class="stxt" id="st">กำลังโหลดข้อมูลจาก Cloud...</span>
+  <span class="stxt" id="st">กำลังโหลดข้อมูล...</span>
   <span class="mbadge" id="mb">VIEW ONLY</span>
 </div>
 
+<!-- WARNING BANNER (duplicate members/vehicle) -->
+<div class="warn-banner" id="wbanner">
+  <span>&#9888;</span>
+  <span id="wbanner-txt"></span>
+</div>
+
+<!-- ════════════════════════════════════
+     PAGE: DISPATCH
+════════════════════════════════════ -->
+<div id="page-dispatch" class="page on">
 <div class="main">
   <div class="stats" id="sr"></div>
   <div class="filters" id="fi"></div>
   <div class="grid" id="cg"></div>
   <div class="tlwrap"><div class="tlhead">Timeline — ออกเดินทาง</div><div class="tlinner" id="tl"></div></div>
-  <div class="hint" id="lub">&#128259; ข้อมูล refresh อัตโนมัติทุก 60 วินาที</div>
+  <div style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:9px 13px;font-size:11px;color:var(--muted)" id="lub">&#128259; refresh อัตโนมัติทุก 60 วินาที</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════
+     PAGE: HISTORY
+════════════════════════════════════ -->
+<div id="page-history" class="page">
+<div class="hist-main">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div>
+      <div style="font-weight:700;font-size:14px;color:var(--navy)">ประวัติแผนงาน</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">ข้อมูลที่บันทึกย้อนหลัง</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted)" id="hist-count"></div>
+  </div>
+  <div id="hist-list">
+    <div style="text-align:center;padding:40px;color:var(--muted);font-size:12px">
+      &#128337; ยังไม่มีประวัติ — กด Save &amp; Sync เพื่อเริ่มบันทึก
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════
+     PAGE: REPORT
+════════════════════════════════════ -->
+<div id="page-report" class="page">
+<div class="rep-main">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div>
+      <div style="font-weight:700;font-size:14px;color:var(--navy)">รายงานสรุป</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">วิเคราะห์จากข้อมูลที่บันทึกไว้</div>
+    </div>
+    <button class="mbtn" onclick="buildReport()">&#128260; รีเฟรช</button>
+  </div>
+  <div id="rep-content">
+    <div style="text-align:center;padding:40px;color:var(--muted);font-size:12px">โหลดข้อมูลก่อนดูรายงาน</div>
+  </div>
+</div>
 </div>
 
 <!-- SAVE FLOAT -->
 <div class="sfloat" id="sf">
   <span style="font-size:11px;color:var(--muted)">&#9888; มีการแก้ไข</span>
-  <button class="mbtn pri" onclick="saveCloud()">&#9729; Save &amp; Sync ทีม</button>
+  <button class="mbtn grn" onclick="saveCloud()">&#9729; Save &amp; Sync ทีม</button>
 </div>
 
 <!-- EDIT MODAL -->
@@ -296,7 +368,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--navy);font-size:13px
         </div>
       </div>
       <div class="fg full">
-        <label class="flbl">ทีมงาน <span style="font-weight:400;color:var(--muted)">(เลือกแล้วกด × เพื่อลบ)</span></label>
+        <label class="flbl">ทีมงาน <span style="font-weight:400;color:var(--muted)">(เลือก → กด × เพื่อลบ)</span></label>
         <div class="selw" style="margin-bottom:5px">
           <select class="fsel" id="fms" onchange="addMem(this.value);this.value=''">
             <option value="">+ เลือกสมาชิก</option>
@@ -328,11 +400,12 @@ body{font-family:var(--ff);background:var(--bg);color:var(--navy);font-size:13px
           </select>
         </div>
         <div class="mem-area" id="mem-area"></div>
+        <div class="warn-msg" id="mem-warn" style="display:none"></div>
       </div>
       <div class="fg">
         <label class="flbl">ทะเบียนรถ</label>
         <div class="selw">
-          <select class="fsel" id="fv">
+          <select class="fsel" id="fv" onchange="checkVehDup()">
             <option value="">— เลือกรถ —</option>
             <option>1ฒษ 2857 (แครี่บอย)</option>
             <option>ผบ 6278 (แครี่บอย)</option>
@@ -343,6 +416,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--navy);font-size:13px
             <option>ผจ 662</option>
           </select>
         </div>
+        <div class="warn-msg" id="veh-warn" style="display:none"></div>
       </div>
       <div class="fg">
         <label class="flbl">เครื่องมือ</label>
@@ -384,14 +458,14 @@ body{font-family:var(--ff);background:var(--bg);color:var(--navy);font-size:13px
 <!-- SETUP TOKEN MODAL -->
 <div class="ov" id="sov">
 <div class="smod">
-  <div class="mhead" style="background:var(--green-lt)">
+  <div class="mhead" style="background:#f0fdf4">
     <div class="mbg" style="background:var(--green)">&#9881;</div>
     <div><div class="mt">ตั้งค่า Admin (ครั้งแรก)</div><div class="ms">กรอก GitHub Token เพื่อ sync ข้อมูล</div></div>
     <button class="xbtn" onclick="document.getElementById('sov').classList.remove('open')">&#10005;</button>
   </div>
   <div class="mbody" style="gap:10px">
     <div style="background:var(--accent-lt);border:1px solid #bfdbfe;border-radius:6px;padding:10px 12px;font-size:11px;color:#1e3a8a;line-height:1.6">
-      &#128274; Token เก็บใน <b>Browser ของคุณเท่านั้น</b> (sessionStorage) ทีมงานไม่สามารถเห็นได้
+      &#128274; Token เก็บใน <b>Browser ของคุณเท่านั้น</b> (sessionStorage) ทีมงานไม่สามารถเห็นได้ และถูกลบเมื่อปิด Browser
     </div>
     <div class="fg">
       <label class="flbl">GitHub Personal Access Token (scope: repo)</label>
@@ -414,13 +488,14 @@ body{font-family:var(--ff);background:var(--bg);color:var(--navy);font-size:13px
 </div>
 
 <script>
-/* CONFIG */
+/* ═══════════════════════════ CONFIG ════════════════════════════ */
 const GH_USER='phongthanakornyaibuathong-lang';
 const GH_REPO='ait';
 const ADMIN_PIN='1234';
 const RAW=`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/main/data.json?t=`;
+const RAW_HIST=`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/main/history.json?t=`;
 
-/* PALETTE */
+/* ═══════════════════════════ PALETTE ════════════════════════════ */
 const PAL=[
   {bg:"#2563eb",n:"T-01"},{bg:"#dc2626",n:"T-02"},{bg:"#0d9488",n:"T-03"},
   {bg:"#ea580c",n:"T-04"},{bg:"#7c3aed",n:"T-05"},{bg:"#16a34a",n:"T-06"},
@@ -436,13 +511,15 @@ const JOBS=[
   {id:"STANDBY", l:"STANDBY",  c:"#475569",bg:"#f8fafc"},
 ];
 
-let teams=[],filt="ALL",eid=null,ejt="STANDBY",selMem=[],isAdmin=false,dirty=false,timer=null;
+/* ═══════════════════════════ STATE ══════════════════════════════ */
+let teams=[],history=[],filt="ALL",eid=null,ejt="STANDBY",selMem=[],isAdmin=false,dirty=false,timer=null;
 const jc=id=>JOBS.find(j=>j.id===id)?.c??"#475569";
 const jl=id=>JOBS.find(j=>j.id===id)?.l??id;
 const jbg=id=>JOBS.find(j=>j.id===id)?.bg??"#f8fafc";
 const isSB=t=>t.jobType==="STANDBY"||!t.site;
 const mArr=s=>s?s.split(",").map(x=>x.trim()).filter(Boolean):[];
 
+/* ═══════════════════════════ DATE ═══════════════════════════════ */
 function thd(){
   const d=new Date(),
     dy=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"],
@@ -450,8 +527,9 @@ function thd(){
   return`วัน${dy[d.getDay()]}ที่ ${d.getDate()} ${mo[d.getMonth()]} ${d.getFullYear()+543}`;
 }
 
+/* ═══════════════════════════ TOAST ══════════════════════════════ */
 let tt;
-function toast(m,t="ok"){
+function toast(m,t="info"){
   const e=document.getElementById("toast");
   e.textContent=m;e.className="toast show "+t;
   clearTimeout(tt);tt=setTimeout(()=>e.className="toast",3500);
@@ -461,103 +539,169 @@ function setSS(s,t){
   document.getElementById("st").textContent=t;
 }
 
-function getToken(){return sessionStorage.getItem("gh_tok")||"";}
-function saveToken(){
-  const t=document.getElementById("ghi").value.trim();
-  if(!t.startsWith("ghp_")){toast("Token ไม่ถูกต้อง — ต้องขึ้นต้นด้วย ghp_","err");return;}
-  sessionStorage.setItem("gh_tok",t);
-  document.getElementById("sov").classList.remove("open");
-  toast("✓ บันทึก Token แล้ว","ok");
-  enterAdmin();
+/* ═══════════════════════════ TABS ═══════════════════════════════ */
+function showTab(page,el){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("on"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));
+  document.getElementById("page-"+page).classList.add("on");
+  el.classList.add("on");
+  if(page==="report")buildReport();
+  if(page==="history")renderHistory();
 }
 
+/* ═══════════════════════════ DUPLICATE CHECK ════════════════════ */
+function getDupMembers(){
+  const usage={};
+  teams.filter(t=>!isSB(t)).forEach(t=>{
+    mArr(t.members).forEach(m=>{
+      if(!usage[m])usage[m]=[];
+      usage[m].push(PAL[t.id-1].n);
+    });
+  });
+  return Object.entries(usage).filter(([,ts])=>ts.length>1);
+}
+function getDupVehicles(){
+  const usage={};
+  teams.filter(t=>!isSB(t)&&t.vehicle).forEach(t=>{
+    if(!usage[t.vehicle])usage[t.vehicle]=[];
+    usage[t.vehicle].push(PAL[t.id-1].n);
+  });
+  return Object.entries(usage).filter(([,ts])=>ts.length>1);
+}
+function checkDuplicates(){
+  const dm=getDupMembers(), dv=getDupVehicles();
+  const banner=document.getElementById("wbanner");
+  const msgs=[];
+  if(dm.length)msgs.push("&#9888; สมาชิกซ้ำ: "+dm.map(([n,ts])=>`${n} (${ts.join(",")})`).join(" · "));
+  if(dv.length)msgs.push("&#128665; รถซ้ำ: "+dv.map(([v,ts])=>`${v.split(" ")[0]} (${ts.join(",")})`).join(" · "));
+  if(msgs.length){
+    document.getElementById("wbanner-txt").innerHTML=msgs.join("  |  ");
+    banner.classList.add("show");
+  }else{banner.classList.remove("show");}
+}
+
+/* ═══════════════════════════ CLOUD LOAD ════════════════════════ */
 async function loadCloud(){
   setSS("sync","กำลังโหลดข้อมูลจาก Cloud...");
   try{
-    const r=await fetch(RAW+Date.now());
-    if(!r.ok)throw new Error("HTTP "+r.status);
-    const d=await r.json();
-    teams=d.teams||[];
-    const lu=d.lastUpdated?new Date(d.lastUpdated).toLocaleString("th-TH",{dateStyle:"short",timeStyle:"short"}):"—";
-    const by=d.updatedBy||"—";
-    setSS("ok",`Sync สำเร็จ · อัพเดทโดย ${by} เมื่อ ${lu}`);
-    document.getElementById("lub").innerHTML=`&#128994; Sync จาก Cloud · อัพเดทโดย <b>${by}</b> เมื่อ ${lu} · auto-refresh ทุก 60 วิ`;
-    renderAll();
+    const [rd,rh]=await Promise.all([
+      fetch(RAW+Date.now()),
+      fetch(RAW_HIST+Date.now())
+    ]);
+    if(rd.ok){
+      const d=await rd.json();
+      teams=d.teams||[];
+      const lu=d.lastUpdated?new Date(d.lastUpdated).toLocaleString("th-TH",{dateStyle:"short",timeStyle:"short"}):"—";
+      const by=d.updatedBy||"—";
+      setSS("ok",`Sync สำเร็จ · ${by} · ${lu}`);
+      document.getElementById("lub").innerHTML=`&#128994; Sync จาก Cloud · อัพเดทโดย <b>${by}</b> เมื่อ ${lu} · auto-refresh ทุก 60 วิ`;
+    }else throw new Error("HTTP "+rd.status);
+    if(rh.ok){const h=await rh.json();history=h.history||[];}
+    renderAll();checkDuplicates();
   }catch(e){
     setSS("err","โหลดไม่สำเร็จ: "+e.message);
-    try{const s=localStorage.getItem("aits_v1");if(s)teams=JSON.parse(s);}catch(_){}
-    renderAll();
+    try{const s=localStorage.getItem("aits_v2");if(s){const d=JSON.parse(s);teams=d.teams||[];history=d.history||[];}}catch(_){}
+    renderAll();checkDuplicates();
   }
+}
+
+/* ═══════════════════════════ CLOUD SAVE ════════════════════════ */
+function getToken(){return sessionStorage.getItem("gh_tok")||"";}
+function saveToken(){
+  const t=document.getElementById("ghi").value.trim();
+  if(!t.startsWith("ghp_")){toast("Token ไม่ถูกต้อง","err");return;}
+  sessionStorage.setItem("gh_tok",t);
+  document.getElementById("sov").classList.remove("open");
+  toast("✓ บันทึก Token แล้ว","ok");enterAdmin();
+}
+
+async function ghPUT(path,content,tok){
+  const rs=await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
+    {headers:{"Authorization":"token "+tok}});
+  const sd=await rs.json();
+  const b64=btoa(unescape(encodeURIComponent(JSON.stringify(content,null,2))));
+  const r=await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,{
+    method:"PUT",headers:{"Authorization":"token "+tok,"Content-Type":"application/json"},
+    body:JSON.stringify({message:"Update "+path+" "+new Date().toLocaleString("th-TH"),content:b64,sha:sd.sha||undefined})
+  });
+  const d=await r.json();
+  if(!d.content)throw new Error(d.message||"Unknown");
+  return d;
 }
 
 async function saveCloud(){
   const tok=getToken();
   if(!tok){document.getElementById("sov").classList.add("open");return;}
-  setSS("sync","กำลัง sync...");toast("⏳ กำลัง Save & Sync...","warn");
+  setSS("sync","กำลัง Save & Sync...");toast("⏳ กำลัง sync...","info");
   try{
-    const rs=await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/data.json`,
-      {headers:{"Authorization":"token "+tok}});
-    const sd=await rs.json();
-    if(!sd.sha)throw new Error(sd.message||"Cannot get SHA");
-    const payload={teams,lastUpdated:new Date().toISOString(),updatedBy:"Nine",date:new Date().toLocaleDateString("th-TH")};
-    const b64=btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2))));
-    const r=await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/data.json`,{
-      method:"PUT",headers:{"Authorization":"token "+tok,"Content-Type":"application/json"},
-      body:JSON.stringify({message:"Update dispatch "+new Date().toLocaleString("th-TH"),content:b64,sha:sd.sha})
-    });
-    const d=await r.json();
-    if(d.content){
-      dirty=false;document.getElementById("sf").classList.remove("show");
-      localStorage.setItem("aits_v1",JSON.stringify(teams));
-      setSS("ok","Sync สำเร็จ ✓");
-      toast("☁ Sync เรียบร้อย — ทีมงานเห็นข้อมูลใหม่ใน 60 วิ","ok");
-    }else throw new Error(d.message||"Unknown");
+    const now=new Date().toISOString();
+    const dataPayload={teams,lastUpdated:now,updatedBy:"Nine",date:new Date().toLocaleDateString("th-TH")};
+
+    // Add to history
+    const todayKey=new Date().toLocaleDateString("th-TH");
+    history=history.filter(h=>h.date!==todayKey);
+    history.unshift({date:todayKey,savedAt:now,teams:JSON.parse(JSON.stringify(teams))});
+    if(history.length>30)history=history.slice(0,30);
+    const histPayload={history,lastUpdated:now};
+
+    await Promise.all([
+      ghPUT("data.json",dataPayload,tok),
+      ghPUT("history.json",histPayload,tok),
+    ]);
+    dirty=false;
+    document.getElementById("sf").classList.remove("show");
+    localStorage.setItem("aits_v2",JSON.stringify({teams,history}));
+    setSS("ok","Sync สำเร็จ ✓");
+    toast("☁ Sync เรียบร้อย — ทีมงานเห็นข้อมูลใหม่ใน 60 วิ","ok");
   }catch(e){setSS("err","Save ไม่สำเร็จ");toast("✕ "+e.message,"err");}
 }
 
 function startRefresh(){clearInterval(timer);timer=setInterval(()=>{if(!dirty)loadCloud();},60000);}
 
-/* ADMIN */
-function toggleMode(){isAdmin?exitAdmin():document.getElementById("pov2").classList.add("open");setTimeout(()=>document.getElementById("pi").focus(),120);}
+/* ═══════════════════════════ ADMIN ══════════════════════════════ */
+function toggleMode(){isAdmin?exitAdmin():openPin();}
+function openPin(){
+  document.getElementById("pi").value="";
+  document.getElementById("pe").textContent="";
+  document.getElementById("pov2").classList.add("open");
+  setTimeout(()=>document.getElementById("pi").focus(),120);
+}
 function checkPin(){
   if(document.getElementById("pi").value===ADMIN_PIN){
     document.getElementById("pov2").classList.remove("open");
     document.getElementById("pi").value="";
-    document.getElementById("pe").textContent="";
     if(!getToken())document.getElementById("sov").classList.add("open");
     else enterAdmin();
-  }else{
-    document.getElementById("pe").textContent="PIN ไม่ถูกต้อง";
-    document.getElementById("pi").value="";
-  }
+  }else{document.getElementById("pe").textContent="PIN ไม่ถูกต้อง";document.getElementById("pi").value="";}
 }
 function enterAdmin(){
   isAdmin=true;
-  document.getElementById("mbtn").innerHTML="<span>&#128275;</span><span id='mlbl'>ออก</span>";
+  document.getElementById("mbtn").innerHTML="&#128275; <span id='mlbl'>ออก</span>";
   document.getElementById("mb").className="mbadge edit";document.getElementById("mb").textContent="EDIT MODE";
   document.getElementById("ibtn").style.display="flex";
   renderCards();toast("✓ เข้าสู่โหมดแก้ไข","ok");
 }
 function exitAdmin(){
   isAdmin=false;dirty=false;
-  document.getElementById("mbtn").innerHTML="<span>&#128274;</span><span id='mlbl'>Admin</span>";
+  document.getElementById("mbtn").innerHTML="&#128274; <span id='mlbl'>Admin</span>";
   document.getElementById("mb").className="mbadge";document.getElementById("mb").textContent="VIEW ONLY";
   document.getElementById("ibtn").style.display="none";
   document.getElementById("sf").classList.remove("show");
-  renderCards();toast("ออกจากโหมดแก้ไข","ok");
+  renderCards();toast("ออกจากโหมดแก้ไข","info");
 }
 
-/* RENDER */
+/* ═══════════════════════════ RENDER ALL ═════════════════════════ */
 function renderAll(){renderStats();renderFilters();renderCards();renderTL();}
 
 function renderStats(){
   const a=teams.filter(t=>!isSB(t)),pax=a.reduce((s,t)=>s+mArr(t.members).length,0),
     vs=new Set(a.map(t=>t.vehicle).filter(v=>v&&v!=="—")).size;
+  const dups=getDupMembers().length+getDupVehicles().length;
   document.getElementById("sr").innerHTML=[
     {ic:"&#9652;",v:a.length,l:"ทีมออกงาน",bg:"#eff4ff",c:"#2563eb"},
     {ic:"&#128119;",v:pax,l:"กำลังพลรวม",bg:"#f0fdf9",c:"#0d9488"},
     {ic:"&#128665;",v:vs,l:"รถออกงาน",bg:"#fff7ed",c:"#ea580c"},
-    {ic:"&#9646;",v:10-a.length,l:"ทีมสำรอง",bg:"#f8fafc",c:"#475569"},
+    {ic:dups?"&#9888;":"&#10003;",v:dups||"OK",l:dups?"แจ้งเตือน":"ไม่มีซ้ำ",bg:dups?"#fffbeb":"#f0fdf4",c:dups?"#b45309":"#16a34a"},
   ].map(x=>`<div class="stat"><div class="stat-ic" style="background:${x.bg};color:${x.c}">${x.ic}</div><div><div class="stat-val">${x.v}</div><div class="stat-lbl">${x.l}</div></div></div>`).join("");
 }
 
@@ -567,17 +711,23 @@ function renderFilters(){
 }
 
 function renderCards(){
+  const dupMems=new Set(getDupMembers().map(([n])=>n));
+  const dupVehs=new Set(getDupVehicles().map(([v])=>v));
   const list=filt==="ALL"?teams:teams.filter(t=>t.jobType===filt);
   document.getElementById("cg").innerHTML=list.map(t=>{
     const p=PAL[t.id-1],sb=isSB(t),ms=mArr(t.members),c=jc(t.jobType),bg=jbg(t.jobType);
+    const hasDupMem=ms.some(m=>dupMems.has(m));
+    const hasDupVeh=t.vehicle&&dupVehs.has(t.vehicle);
+    const hasWarn=hasDupMem||hasDupVeh;
     const eb=isAdmin?`<button class="eic" onclick="event.stopPropagation();openE(${t.id})" title="แก้ไข">&#9998;</button>`:"";
+    const warnDot=hasWarn?`<span class="warn-ic" title="${hasDupMem?"สมาชิกซ้ำ":""}${hasDupVeh?" รถซ้ำ":""}">&#9888;</span>`:"";
     const body=sb?`<div class="sbmsg">— ไม่มีงานวันนี้ —</div>`:`
       <div class="trow">
         <div class="tbox" style="background:${c}12"><div class="tlbl">ออกเดินทาง</div><div class="tval" style="color:${c}">${t.depart||"—"}</div></div>
         <div class="tbox" style="background:${c}12"><div class="tlbl">ถึงหน้างาน</div><div class="tval" style="color:${c}">${t.arrive||"—"}</div></div>
       </div>
-      ${ms.length?`<div class="mem-row">${ms.map(m=>`<span class="pill" style="background:${c}14;color:${c}">${m}</span>`).join("")}</div>`:""}
-      ${t.vehicle?`<div class="veh">&#128665; <b>${t.vehicle}</b></div>`:""}`;
+      ${ms.length?`<div class="mem-row">${ms.map(m=>`<span class="pill${dupMems.has(m)?" warn-pill":""}" style="${dupMems.has(m)?"":"background:"+c+"14;color:"+c}">${m}</span>`).join("")}</div>`:""}
+      ${t.vehicle?`<div class="veh">&#128665; <b>${t.vehicle}</b>${hasDupVeh?` <span class="warn-pill">ซ้ำ</span>`:"" }</div>`:""}`;
     return`<div class="card">
       <div class="card-accent" style="background:${sb?"#dde4ed":p.bg}"></div>
       <div class="card-head" style="background:${sb?"#fafbfc":c+"09"}">
@@ -586,6 +736,7 @@ function renderCards(){
           <div class="csite" style="color:${sb?"#8899aa":"var(--navy)"}">${sb?"— ไม่มีงาน —":t.site}</div>
           <div class="cjn">${t.jobNo||"—"}</div>
         </div>
+        ${warnDot}
         <span class="jpill" style="background:${bg};color:${c};border-color:${c}44">${jl(t.jobType)}</span>
         ${eb}
       </div>
@@ -605,7 +756,113 @@ function renderTL(){
   document.getElementById("tl").innerHTML=`<div class="tlline"></div>${ticks}${dots}`;
 }
 
-/* EDIT */
+/* ═══════════════════════════ HISTORY ═══════════════════════════ */
+function renderHistory(){
+  const el=document.getElementById("hist-list");
+  document.getElementById("hist-count").textContent=history.length+" รายการ";
+  if(!history.length){
+    el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted);font-size:12px">&#128337; ยังไม่มีประวัติ — กด Save &amp; Sync เพื่อเริ่มบันทึก</div>`;
+    return;
+  }
+  el.innerHTML=history.map((h,hi)=>{
+    const act=h.teams.filter(t=>!isSB(t));
+    const pax=act.reduce((s,t)=>s+mArr(t.members).length,0);
+    const rows=act.map(t=>{
+      const p=PAL[t.id-1];const c=jc(t.jobType);
+      return`<tr>
+        <td><span style="background:${p.bg};color:#fff;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700">${p.n}</span></td>
+        <td><span style="background:${jbg(t.jobType)};color:${c};border:1px solid ${c}44;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700">${jl(t.jobType)}</span></td>
+        <td style="font-weight:600">${t.site}</td>
+        <td style="color:#2563eb;font-size:10px">${t.jobNo||"—"}</td>
+        <td style="font-weight:700;color:#dc2626">${t.depart||"—"}</td>
+        <td>${t.members||"—"}</td>
+        <td style="font-size:10px">${t.vehicle||"—"}</td>
+      </tr>`;
+    }).join("");
+    const savedAt=h.savedAt?new Date(h.savedAt).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}):"";
+    return`<div class="hist-day">
+      <div class="hist-day-head" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <div>
+          <div class="hist-day-title">&#128197; ${h.date}</div>
+          <div class="hist-day-meta">${act.length} ทีม · ${pax} คน${savedAt?" · บันทึก "+savedAt:""}</div>
+        </div>
+        <span style="font-size:12px;color:var(--muted)">&#9660;</span>
+      </div>
+      <div style="${hi===0?"":"display:none"}">
+        <div style="overflow-x:auto">
+          <table class="hist-table">
+            <thead><tr><th>ทีม</th><th>ประเภท</th><th>Site</th><th>Job No.</th><th>ออก</th><th>ทีมงาน</th><th>รถ</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ═══════════════════════════ REPORT ════════════════════════════ */
+function buildReport(){
+  const el=document.getElementById("rep-content");
+  if(!history.length){
+    el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted);font-size:12px">ยังไม่มีข้อมูลเพียงพอ — ต้องมี Backup อย่างน้อย 1 วัน</div>`;
+    return;
+  }
+  // count job types
+  const jtCount={};
+  const siteCount={};
+  const memCount={};
+  history.forEach(h=>{
+    h.teams.filter(t=>!isSB(t)).forEach(t=>{
+      jtCount[t.jobType]=(jtCount[t.jobType]||0)+1;
+      siteCount[t.site]=(siteCount[t.site]||0)+1;
+      mArr(t.members).forEach(m=>{memCount[m]=(memCount[m]||0)+1;});
+    });
+  });
+  const totalDays=history.length;
+  const totalJobs=Object.values(jtCount).reduce((a,b)=>a+b,0);
+  const totalPax=Object.values(memCount).reduce((a,b)=>a+b,0);
+  const avgTeams=(totalJobs/totalDays).toFixed(1);
+  const topSites=Object.entries(siteCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const topMems=Object.entries(memCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxSite=topSites[0]?.[1]||1;
+  const maxMem=topMems[0]?.[1]||1;
+  const jtOrder=["BOLT","FLANGE","COLD_CUT","TRAINING","ROBOT","STANDBY"];
+  const jtBars=jtOrder.filter(j=>jtCount[j]).map(j=>`
+    <div class="rep-bar-row">
+      <span class="rep-bar-lbl" style="color:${jc(j)}">${jl(j)}</span>
+      <div class="rep-bar-wrap"><div class="rep-bar" style="width:${Math.round((jtCount[j]/totalJobs)*100)}%;background:${jc(j)}"></div></div>
+      <span class="rep-bar-val">${jtCount[j]}</span>
+    </div>`).join("");
+  const siteBars=topSites.map(([s,v])=>`
+    <div class="rep-bar-row">
+      <span class="rep-bar-lbl">${s.split(" ")[0]}</span>
+      <div class="rep-bar-wrap"><div class="rep-bar" style="width:${Math.round((v/maxSite)*100)}%;background:#2563eb"></div></div>
+      <span class="rep-bar-val">${v}</span>
+    </div>`).join("");
+  const memBars=topMems.map(([m,v])=>`
+    <div class="rep-bar-row">
+      <span class="rep-bar-lbl">${m}</span>
+      <div class="rep-bar-wrap"><div class="rep-bar" style="width:${Math.round((v/maxMem)*100)}%;background:#0d9488"></div></div>
+      <span class="rep-bar-val">${v}</span>
+    </div>`).join("");
+
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px">
+      ${[["&#128197;",totalDays,"วันที่บันทึก","#eff4ff","#2563eb"],["&#128203;",totalJobs,"งานทั้งหมด","#f0fdf9","#0d9488"],["&#9997;",avgTeams,"เฉลี่ย/วัน","#faf5ff","#7c3aed"]].map(([ic,v,l,bg,c])=>`
+        <div style="background:${bg};border-radius:7px;padding:12px 14px;text-align:center">
+          <div style="font-size:20px">${ic}</div>
+          <div style="font-size:22px;font-weight:700;color:${c};line-height:1.2">${v}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">${l}</div>
+        </div>`).join("")}
+    </div>
+    <div class="rep-grid">
+      <div class="rep-card"><div class="rep-title">ประเภทงาน</div>${jtBars}</div>
+      <div class="rep-card"><div class="rep-title">Site ที่บ่อย</div>${siteBars||"<div style='color:var(--muted);font-size:11px'>ยังไม่มีข้อมูล</div>"}</div>
+    </div>
+    <div class="rep-card"><div class="rep-title">สมาชิกที่ออกงานบ่อย (Top 8)</div>${memBars||"<div style='color:var(--muted);font-size:11px'>ยังไม่มีข้อมูล</div>"}</div>`;
+}
+
+/* ═══════════════════════════ EDIT ═══════════════════════════════ */
 function openE(id){
   if(!isAdmin)return;
   eid=id;const t=teams.find(x=>x.id===id),p=PAL[id-1];
@@ -618,50 +875,53 @@ function openE(id){
   setSel("fs",t.site,"_other","fs-txt");
   setSel("fd",t.depart);setSel("fa",t.arrive);setSel("fv",t.vehicle);
   setSel("fe",t.equipment,"_other","fe-txt");
-  renderJT();renderMemPills();
+  document.getElementById("mem-warn").style.display="none";
+  document.getElementById("veh-warn").style.display="none";
+  renderJT();renderMemPills();checkVehDup();
   document.getElementById("eov").classList.add("open");
 }
-
 function setSel(id,val,otherVal,txtId){
   const s=document.getElementById(id);let found=false;
   for(let i=0;i<s.options.length;i++){
     if(s.options[i].text===val||s.options[i].value===val){s.value=s.options[i].value;found=true;break;}
   }
-  if(!found&&val&&otherVal){
-    s.value=otherVal;
-    const t=document.getElementById(txtId);
-    if(t){t.style.display="block";t.value=val;}
-  } else if(txtId){
-    const t=document.getElementById(txtId);
-    if(t)t.style.display="none";
-  }
+  if(!found&&val&&otherVal){s.value=otherVal;const t=document.getElementById(txtId);if(t){t.style.display="block";t.value=val;}}
+  else if(txtId){const t=document.getElementById(txtId);if(t)t.style.display="none";}
   if(!found&&!val)s.value="";
 }
-
-function onSiteChange(){
-  document.getElementById("fs-txt").style.display=document.getElementById("fs").value==="_other"?"block":"none";
+function onSiteChange(){document.getElementById("fs-txt").style.display=document.getElementById("fs").value==="_other"?"block":"none";}
+function onEquipChange(){document.getElementById("fe-txt").style.display=document.getElementById("fe").value==="_other"?"block":"none";}
+function checkVehDup(){
+  const v=document.getElementById("fv").options[document.getElementById("fv").selectedIndex]?.text||"";
+  if(!v||v.startsWith("—")){document.getElementById("veh-warn").style.display="none";return;}
+  const other=teams.filter(t=>t.id!==eid&&!isSB(t)&&t.vehicle===v);
+  const w=document.getElementById("veh-warn");
+  if(other.length){w.textContent="⚠ รถซ้ำกับ "+other.map(t=>PAL[t.id-1].n).join(", ");w.style.display="block";}
+  else w.style.display="none";
 }
-function onEquipChange(){
-  document.getElementById("fe-txt").style.display=document.getElementById("fe").value==="_other"?"block":"none";
+function addMem(name){
+  if(!name)return;
+  if(selMem.includes(name)){toast(name+" อยู่ในทีมนี้แล้ว","warn");return;}
+  const other=teams.filter(t=>t.id!==eid&&!isSB(t)&&mArr(t.members).includes(name));
+  selMem.push(name);renderMemPills();
+  if(other.length){
+    const w=document.getElementById("mem-warn");
+    w.innerHTML="⚠ "+name+" ซ้ำกับ "+other.map(t=>PAL[t.id-1].n).join(", ");
+    w.style.display="block";
+  }
 }
-
-function addMem(name){if(!name||selMem.includes(name))return;selMem.push(name);renderMemPills();}
-function rmMem(name){selMem=selMem.filter(x=>x!==name);renderMemPills();}
+function rmMem(name){selMem=selMem.filter(x=>x!==name);renderMemPills();document.getElementById("mem-warn").style.display="none";}
 function renderMemPills(){
   const c=jc(ejt);
+  const dups=new Set(teams.filter(t=>t.id!==eid&&!isSB(t)).flatMap(t=>mArr(t.members)));
   document.getElementById("mem-area").innerHTML=selMem.length
-    ?selMem.map(m=>`<span class="mem-pill" style="background:${c}18;color:${c}" onclick="rmMem('${m}')"><span>${m}</span><span class="rm">×</span></span>`).join("")
+    ?selMem.map(m=>`<span class="mem-pill2" style="background:${dups.has(m)?"#fef3c7":""+c+"18"};color:${dups.has(m)?"#b45309":c}" onclick="rmMem('${m}')"><span>${m}</span><span style="font-size:13px;line-height:1">×</span></span>`).join("")
     :`<span style="font-size:11px;color:var(--muted)">ยังไม่มีสมาชิก — เลือกจาก dropdown ด้านบน</span>`;
 }
-
 function renderJT(){
-  document.getElementById("jtr").innerHTML=JOBS.map(j=>{
-    const on=ejt===j.id;
-    return`<button class="jt${on?" on":""}" style="${on?`background:${j.bg};border-color:${j.c};color:${j.c}`:""}" onclick="setJT('${j.id}')">${j.l}</button>`;
-  }).join("");
+  document.getElementById("jtr").innerHTML=JOBS.map(j=>{const on=ejt===j.id;return`<button class="jt${on?" on":""}" style="${on?`background:${j.bg};border-color:${j.c};color:${j.c}`:""}" onclick="setJT('${j.id}')">${j.l}</button>`;}).join("");
 }
 function setJT(id){ejt=id;renderJT();renderMemPills();}
-
 function closeE(){document.getElementById("eov").classList.remove("open");}
 function saveE(){
   const siteVal=document.getElementById("fs").value==="_other"?document.getElementById("fs-txt").value:document.getElementById("fs").value;
@@ -673,10 +933,11 @@ function saveE(){
     members:selMem.join(", "),vehicle:vehText,equipment:eqVal,contact:document.getElementById("fc").value.trim()};
   closeE();dirty=true;
   document.getElementById("sf").classList.add("show");
-  renderAll();toast("✓ บันทึก "+PAL[eid-1].n+" แล้ว — กด Save & Sync","warn");
+  renderAll();checkDuplicates();
+  toast("✓ บันทึก "+PAL[eid-1].n+" — กด Save & Sync","warn");
 }
 
-/* EXCEL */
+/* ═══════════════════════════ EXCEL ══════════════════════════════ */
 document.getElementById("xlf").addEventListener("change",function(e){
   if(!isAdmin)return;
   const f=e.target.files[0];if(!f)return;
@@ -689,13 +950,13 @@ document.getElementById("xlf").addEventListener("change",function(e){
       site:String(r[2]||""),jobNo:String(r[3]||""),depart:String(r[4]||""),arrive:String(r[5]||""),
       members:String(r[6]||""),vehicle:String(r[7]||""),equipment:String(r[8]||""),contact:String(r[9]||"")}));
     while(m.length<10)m.push({id:m.length+1,jobType:"STANDBY",site:"",jobNo:"",depart:"",arrive:"",members:"",vehicle:"",equipment:"",contact:""});
-    teams=m;dirty=true;document.getElementById("sf").classList.add("show");renderAll();
-    toast(`✓ Import ${m.filter(t=>t.site).length} ทีม — กด Save & Sync`,"ok");
+    teams=m;dirty=true;document.getElementById("sf").classList.add("show");
+    renderAll();checkDuplicates();toast(`✓ Import ${m.filter(t=>t.site).length} ทีม — กด Save & Sync`,"ok");
   }catch(err){toast("✕ Import ไม่สำเร็จ","err");}};
   r.readAsBinaryString(f);e.target.value="";
 });
 
-/* PRINT */
+/* ═══════════════════════════ PRINT ══════════════════════════════ */
 function openPrint(){
   const act=teams.filter(t=>!isSB(t)),pax=act.reduce((s,t)=>s+mArr(t.members).length,0);
   document.getElementById("pa").innerHTML=`
@@ -706,9 +967,9 @@ function openPrint(){
     <div style="display:flex;gap:10px;margin-bottom:16px">
       ${[["ทีมออกงาน",act.length,"#2563eb"],["กำลังพลรวม",pax,"#0d9488"],["Total Jobs",act.length,"#7c3aed"]].map(([l,v,c])=>`<div style="flex:1;border:2px solid ${c};border-radius:7px;padding:9px 12px;text-align:center"><div style="font-size:23px;font-weight:700;color:${c}">${v}</div><div style="font-size:11px;color:#7a92ab">${l}</div></div>`).join("")}
     </div>
-    <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:Tahoma,sans-serif">
+    <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:Tahoma,sans-serif;table-layout:fixed">
       <thead><tr style="background:#1a2332">${["ทีม","ประเภท","Site","Job No.","ออก","ถึง","ทีมงาน","รถ","เครื่องมือ","ติดต่อ"].map(h=>`<th style="color:#fff;padding:6px 7px;text-align:left;font-size:10px">${h}</th>`).join("")}</tr></thead>
-      <tbody>${act.map((t,i)=>{const p=PAL[t.id-1];const c=jc(t.jobType);return`<tr style="background:${i%2===0?"#f5f7fa":"#fff"}"><td style="padding:5px 7px"><span style="background:${p.bg};color:#fff;border-radius:3px;padding:2px 5px;font-size:9px;font-weight:700">${p.n}</span></td><td style="padding:5px 7px"><span style="background:${jbg(t.jobType)};color:${c};border:1px solid ${c}44;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700">${jl(t.jobType)}</span></td><td style="padding:5px 7px;font-weight:700">${t.site}</td><td style="padding:5px 7px;font-family:monospace;color:#2563eb">${t.jobNo}</td><td style="padding:5px 7px;font-weight:700;color:#dc2626">${t.depart||"—"}</td><td style="padding:5px 7px;font-weight:700;color:#16a34a">${t.arrive||"—"}</td><td style="padding:5px 7px">${t.members||"—"}</td><td style="padding:5px 7px;font-size:10px">${t.vehicle||"—"}</td><td style="padding:5px 7px;font-size:10px">${t.equipment||"—"}</td><td style="padding:5px 7px;font-size:10px">${t.contact||"—"}</td></tr>`;}).join("")}</tbody>
+      <tbody>${act.map((t,i)=>{const p=PAL[t.id-1];const c=jc(t.jobType);return`<tr style="background:${i%2===0?"#f5f7fa":"#fff"}"><td style="padding:5px 7px"><span style="background:${p.bg};color:#fff;border-radius:3px;padding:2px 5px;font-size:9px;font-weight:700">${p.n}</span></td><td style="padding:5px 7px"><span style="background:${jbg(t.jobType)};color:${c};border:1px solid ${c}44;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700">${jl(t.jobType)}</span></td><td style="padding:5px 7px;font-weight:700;font-size:10px">${t.site}</td><td style="padding:5px 7px;color:#2563eb;font-size:10px">${t.jobNo}</td><td style="padding:5px 7px;font-weight:700;color:#dc2626">${t.depart||"—"}</td><td style="padding:5px 7px;font-weight:700;color:#16a34a">${t.arrive||"—"}</td><td style="padding:5px 7px;font-size:10px">${t.members||"—"}</td><td style="padding:5px 7px;font-size:10px">${t.vehicle||"—"}</td><td style="padding:5px 7px;font-size:10px">${t.equipment||"—"}</td><td style="padding:5px 7px;font-size:10px">${t.contact||"—"}</td></tr>`;}).join("")}</tbody>
     </table>
     <div style="margin-top:28px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
       ${["จัดทำโดย","ตรวจสอบโดย","อนุมัติโดย"].map(r=>`<div style="text-align:center"><div style="border-bottom:1px solid #1a2332;margin-bottom:5px;padding-bottom:24px"></div><div style="font-size:11px;color:#7a92ab">${r}</div></div>`).join("")}
@@ -717,11 +978,10 @@ function openPrint(){
   document.getElementById("pov").classList.add("show");
 }
 
-/* INIT */
+/* ═══════════════════════════ INIT ═══════════════════════════════ */
 document.getElementById("nth").textContent=thd();
 document.getElementById("nen").textContent=new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
-loadCloud();
-startRefresh();
+loadCloud();startRefresh();
 </script>
 </body>
 </html>
