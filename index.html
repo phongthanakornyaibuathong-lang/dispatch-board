@@ -241,6 +241,35 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px
 .pbar{background:#1a2332;padding:11px 18px;display:flex;align-items:center;gap:11px}
 .pbar span{color:#fff;font-weight:600;font-size:13px}
 
+
+/* CALENDAR */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:10px}
+.cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
+.cal-dow{text-align:center;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;padding:4px}
+.cal-day{border:.5px solid var(--border);border-radius:8px;padding:6px 7px;min-height:70px;background:var(--card);cursor:pointer;transition:all .15s;position:relative}
+.cal-day:hover{background:var(--bg3);border-color:var(--blue)}
+.cal-day.today{border-color:var(--blue);background:rgba(10,132,255,.07)}
+.cal-day.other-month{opacity:.4}
+.cal-day.selected{border-color:var(--blue);background:rgba(10,132,255,.12)}
+.cal-day-num{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
+.cal-day.today .cal-day-num{background:var(--blue);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px}
+.cal-team-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:1px}
+.cal-teams-row{display:flex;flex-wrap:wrap;gap:2px;margin-top:2px}
+.cal-pax{font-size:9px;color:var(--text3);margin-top:2px}
+.cal-nav{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.cal-month-title{font-size:16px;font-weight:700;color:var(--text);flex:1;text-align:center}
+.cal-btn{width:32px;height:32px;border-radius:8px;border:.5px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:var(--ff)}
+.cal-btn:hover{background:var(--bg4);color:var(--text)}
+.cal-view-btns{display:flex;gap:5px}
+.cal-vbtn{padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;border:.5px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all .15s;font-family:var(--ff)}
+.cal-vbtn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+/* day detail panel */
+.day-panel{background:var(--card);border:.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:11px}
+.day-panel-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+/* EXPORT btn */
+.exp-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;background:rgba(48,209,88,.1);border:none;color:var(--green);font-family:var(--ff);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.exp-btn:hover{background:rgba(48,209,88,.18)}
+
 @media(max-width:640px){
   .fgrid{grid-template-columns:1fr}.fg.full{grid-column:1}
   .rep-grid{grid-template-columns:1fr}.nd{display:none}
@@ -271,6 +300,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px
 <div class="tabs">
   <div class="tab on"  onclick="showTab('dispatch',this)">🚀 แผนงานวันนี้</div>
   <div class="tab"     onclick="showTab('manpower',this)">👷 Manpower</div>
+  <div class="tab"     onclick="showTab('calendar',this)">📅 ปฏิทิน</div>
   <div class="tab"     onclick="showTab('history',this)">🕐 ประวัติ</div>
   <div class="tab"     onclick="showTab('report',this)">📊 รายงาน</div>
   <div class="tab"     onclick="showTab('settings',this)">⚙️ ตั้งค่า</div>
@@ -357,6 +387,41 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px
       <div><div class="set-lbl">GitHub Token</div><div class="set-sub" id="tok-status">ยังไม่ได้ตั้งค่า</div></div>
       <span style="color:var(--blue);font-size:12px;cursor:pointer" onclick="document.getElementById('sov').classList.add('open')">ตั้งค่า</span>
     </div>
+  </div>
+</div></div>
+
+
+<!-- PAGE: CALENDAR -->
+<div id="page-calendar" class="page"><div class="main">
+  <div class="sec-head">
+    <div><div class="sec-title">📅 ตารางแผนงาน</div><div class="sec-sub" id="cal-sub">กำลังโหลด...</div></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="exp-btn" onclick="exportExcel()">📊 Export Excel</button>
+      <div class="cal-view-btns">
+        <button class="cal-vbtn on" id="vbtn-month" onclick="setCalView('month',this)">เดือน</button>
+        <button class="cal-vbtn"   id="vbtn-year"  onclick="setCalView('year',this)">ปี</button>
+      </div>
+    </div>
+  </div>
+  <!-- Month nav -->
+  <div class="cal-nav">
+    <button class="cal-btn" onclick="calMove(-1)">‹</button>
+    <span class="cal-month-title" id="cal-title"></span>
+    <button class="cal-btn" onclick="calMove(1)">›</button>
+    <button class="cal-btn" onclick="goToday()" title="วันนี้" style="font-size:11px;font-weight:700">วันนี้</button>
+  </div>
+  <!-- Calendar grid -->
+  <div id="cal-container"></div>
+  <!-- Day detail panel -->
+  <div class="day-panel" id="day-panel" style="display:none">
+    <div class="day-panel-title">
+      <span id="day-panel-title">—</span>
+      <div style="display:flex;gap:8px">
+        <button class="nbtn pri" id="day-plan-btn" onclick="openDayPlan()" style="display:none">✎ วางแผนวันนี้</button>
+        <button class="cal-btn" onclick="document.getElementById('day-panel').style.display='none'">✕</button>
+      </div>
+    </div>
+    <div id="day-panel-content"></div>
   </div>
 </div></div>
 
@@ -574,9 +639,10 @@ const DCFG={
     "Bangchak Refinery","EGAT","STP&I","STECON","GCM PTA","Qtech/TOP",
   ],
   skills: ALL_SKILLS,
+  positions:["Operation Manager","Engineer","Supervisor","Technician","Robot Tech","Store","ผู้รับเหมา"],
   timeSlots:{
-    depart:["04:30","05:00","05:30","06:00","06:30","07:00","07:30","08:00","08:30","09:00","09:30","10:00"],
-    arrive: ["05:30","06:00","06:30","07:00","07:30","08:00","08:30","09:00","09:30","10:00","10:30","11:00"]
+    depart:["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"],
+    arrive:["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"]
   }
 };
 
@@ -649,6 +715,7 @@ function showTab(page,el){
   if(page==="history")renderHistory();
   if(page==="manpower")renderManpower();
   if(page==="settings")renderSettings();
+  if(page==="calendar")renderCalendar();
 }
 
 /* ═══════════════════════════ CLOUD ══════════════════════════ */
@@ -690,15 +757,26 @@ async function loadCloud(){
     renderAll();checkDups();checkExpiry();
   }
 }
-async function ghPUT(path,content,tok){
-  const rs=await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,{headers:{"Authorization":"token "+tok}});
-  const sd=await rs.json();
+async function ghPUT(path,content,tok,retries=2){
+  // Always fetch fresh SHA to avoid conflict errors
+  let sha=null;
+  try{
+    const rs=await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
+      {headers:{"Authorization":"token "+tok,"Cache-Control":"no-cache"}});
+    if(rs.ok){const sd=await rs.json();sha=sd.sha||null;}
+  }catch(_){}
   const b64=btoa(unescape(encodeURIComponent(JSON.stringify(content,null,2))));
   const body={message:"Update "+path+" "+new Date().toLocaleString("th-TH"),content:b64};
-  if(sd.sha)body.sha=sd.sha;
+  if(sha)body.sha=sha;
   const r=await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,{
-    method:"PUT",headers:{"Authorization":"token "+tok,"Content-Type":"application/json"},body:JSON.stringify(body)});
-  const d=await r.json();if(!d.content)throw new Error(d.message||"Unknown");return d;
+    method:"PUT",headers:{"Authorization":"token "+tok,"Content-Type":"application/json"},
+    body:JSON.stringify(body)});
+  const d=await r.json();
+  if(!d.content){
+    if(retries>0&&(d.message||"").includes("sha"))return ghPUT(path,content,tok,retries-1);
+    throw new Error(d.message||"Upload failed");
+  }
+  return d;
 }
 async function saveCloud(){
   const tok=getTok();if(!tok){document.getElementById("sov").classList.add("open");return;}
@@ -719,7 +797,17 @@ async function saveCloud(){
     dirty=false;document.getElementById("sf").classList.remove("show");
     localStorage.setItem("aits_v4",JSON.stringify({teams,cfg}));
     setSS("ok","Sync สำเร็จ ✓");toast("☁ Sync เรียบร้อย — ทีมงานเห็นในไม่กี่วิ","ok");
-  }catch(e){setSS("err","Save ไม่สำเร็จ");toast("✕ "+e.message,"err");}
+  }catch(e){
+    setSS("err","Save ไม่สำเร็จ");
+    const msg=e.message||"";
+    if(msg.toLowerCase().includes("bad credentials")||msg.toLowerCase().includes("unauthorized")){
+      toast("✕ Token ไม่ถูกต้อง/หมดอายุ — กรุณา Login ใหม่","err");
+      sessionStorage.removeItem("gh_tok");
+      setTimeout(()=>document.getElementById("sov").classList.add("open"),1000);
+    }else{
+      toast("✕ "+msg,"err");
+    }
+  }
 }
 function startRefresh(){clearInterval(timer);timer=setInterval(()=>{if(!dirty)loadCloud();},60000);}
 
@@ -1047,10 +1135,13 @@ function renderSettings(){
     </div>`;
   }).join("");
   document.getElementById("jtype-list").innerHTML=mkList(cfg.jobTypes,"jobtype",false);
+  const posOpts=(cur)=>(cfg.positions||["Engineer","Supervisor","Technician","Robot Tech","Store","ผู้รับเหมา"]).map(p=>`<option value="${p}" ${p===cur?"selected":""}>${p}</option>`).join("");
   document.getElementById("person-list").innerHTML=cfg.personnel.map((p,i)=>`
     <div class="item-row">
       <div style="width:28px;height:28px;border-radius:50%;background:${p.color||"#636366"};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${(p.nick||p.id).slice(0,2)}</div>
-      <div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text)">${p.nick||p.id}</div><div style="font-size:11px;color:var(--text3)">${p.pos||""}</div></div>
+      <div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text)">${p.nick||p.id}</div>
+        ${isAdmin?`<select class="fsel" style="font-size:11px;padding:3px 8px;margin-top:3px;width:auto;display:inline-block" onchange="updatePersonPos('${p.id}',this.value)"><${posOpts(p.pos)}/select>`:`<div style="font-size:11px;color:var(--text3)">${p.pos||""}</div>`}
+      </div>
       <button class="nbtn" style="font-size:11px;padding:4px 9px" onclick="openPD('${p.id}')">Skills / Cards</button>
       ${isAdmin?`<button class="del-btn" onclick="delItem('person',${i})">×</button>`:""}
     </div>`).join("");
@@ -1185,8 +1276,11 @@ function saveE(){
   teams[i]={...teams[i],jobType:ejt,site:sv,jobNo:document.getElementById("fj").value.trim(),
     depart:document.getElementById("fd").value,arrive:document.getElementById("fa").value,
     members:selMem.join(", "),vehicle:vt,equipment:ev,contact:document.getElementById("fc").value.trim()};
-  closeE();dirty=true;document.getElementById("sf").classList.add("show");
-  renderAll();checkDups();checkExpiry();toast("✓ บันทึก "+DPAL[eid-1]?.n+" — กด Save & Sync","warn");
+  closeE();dirty=true;
+  document.getElementById("sf").classList.add("show");
+  localStorage.setItem("aits_v4",JSON.stringify({teams,cfg}));
+  renderAll();checkDups();checkExpiry();
+  toast("✓ บันทึก "+DPAL[eid-1]?.n+" — กด Save & Sync ทีม ☁","warn");
 }
 
 /* ═══════════════════════════ EXCEL IMPORT ══════════════════ */
@@ -1227,6 +1321,204 @@ function openPrint(){
     </div>
     <div style="margin-top:12px;font-size:9px;color:#94a3b8;text-align:center">AIT &amp; Services Co., Ltd. · ${new Date().toLocaleString("th-TH")}</div>`;
   document.getElementById("pov").classList.add("show");
+}
+
+
+/* ══════════════════ POSITION UPDATE ════════════════════════ */
+function updatePersonPos(personId, newPos){
+  const pi=cfg.personnel.findIndex(x=>x.id===personId);
+  if(pi>=0){cfg.personnel[pi].pos=newPos;dirty=true;document.getElementById("sf").classList.add("show");
+  toast(`✓ เปลี่ยนตำแหน่ง ${personId} → ${newPos}`,"ok");}
+}
+
+/* ══════════════════ EXPORT EXCEL ════════════════════════════ */
+function exportExcel(){
+  // Build workbook from teams + history
+  const today=new Date();
+  const rows=[["AITs Dashboard — Export "+today.toLocaleDateString("th-TH")],[]];
+  rows.push(["วันที่","ทีม","ประเภท","Site","Job No.","ออกเดินทาง","ถึงหน้างาน","สมาชิก","รถ","เครื่องมือ","ติดต่อ"]);
+  // Today's data
+  teams.filter(t=>!isSB(t)).forEach(t=>{
+    const p=DPAL[t.id-1]||{n:"T-"+t.id};
+    rows.push([today.toLocaleDateString("th-TH"),p.n,jl(t.jobType),t.site,t.jobNo,t.depart,t.arrive,t.members,t.vehicle,t.equipment,t.contact]);
+  });
+  // History
+  rows.push([]);rows.push(["=== ประวัติย้อนหลัง ==="]);
+  const hist=Array.isArray(historyData)?historyData:[];
+  hist.forEach(h=>{
+    (h.teams||[]).filter(t=>!isSB(t)).forEach(t=>{
+      const p=DPAL[(t.id||1)-1]||{n:"T-"+t.id};
+      rows.push([h.date||h.day_th||"",p.n,jl(t.jobType),t.site,t.jobNo,t.depart,t.arrive,t.members,t.vehicle,t.equipment,t.contact]);
+    });
+  });
+  // Convert to CSV
+  const csv=rows.map(r=>r.map(c=>`"${String(c||"").replace(/"/g,'""')}"`).join(",")).join("\n");
+  const bom="\uFEFF";
+  const blob=new Blob([bom+csv],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download=`AITs_Export_${today.toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  toast("✓ Export CSV เรียบร้อย","ok");
+}
+
+/* ══════════════════ CALENDAR STATE ══════════════════════════ */
+let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
+let calView="month"; // "month" | "year"
+let calSelDate=null;
+// Multi-day plans storage: { "2026-05-31": {teams:[...]} }
+let dayPlans={};
+
+function calDateKey(y,m,d){return`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+function setCalView(v,el){
+  calView=v;
+  document.querySelectorAll(".cal-vbtn").forEach(b=>b.classList.remove("on"));
+  el.classList.add("on");
+  renderCalendar();
+}
+function calMove(delta){
+  if(calView==="month"){
+    calMonth+=delta;
+    if(calMonth>11){calMonth=0;calYear++;}
+    if(calMonth<0){calMonth=11;calYear--;}
+  }else{calYear+=delta;}
+  renderCalendar();
+}
+function goToday(){calYear=new Date().getFullYear();calMonth=new Date().getMonth();calView="month";document.getElementById("vbtn-month").classList.add("on");document.getElementById("vbtn-year").classList.remove("on");renderCalendar();}
+
+function getTeamsForDate(dateKey){
+  // Check dayPlans first, then historyData, then today's teams
+  if(dayPlans[dateKey]) return dayPlans[dateKey].teams;
+  const hist=Array.isArray(historyData)?historyData:[];
+  const hd=hist.find(h=>h.savedAt&&h.savedAt.startsWith(dateKey));
+  if(hd) return hd.teams||[];
+  // Today
+  const today=new Date(),tk=calDateKey(today.getFullYear(),today.getMonth(),today.getDate());
+  if(dateKey===tk) return teams;
+  return [];
+}
+
+function renderCalendar(){
+  const thMonths=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  const thDows=["อา","จ","อ","พ","พฤ","ศ","ส"];
+  document.getElementById("cal-sub").textContent="ปฏิทินแผนงานประจำเดือน/ปี";
+  if(calView==="month"){
+    document.getElementById("cal-title").textContent=`${thMonths[calMonth]} ${calYear+543}`;
+    renderMonthView();
+  }else{
+    document.getElementById("cal-title").textContent=`ปี ${calYear+543}`;
+    renderYearView();
+  }
+}
+
+function renderMonthView(){
+  const today=new Date();
+  const todayKey=calDateKey(today.getFullYear(),today.getMonth(),today.getDate());
+  const firstDay=new Date(calYear,calMonth,1).getDay(); // 0=Sun
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const daysInPrev=new Date(calYear,calMonth,0).getDate();
+  const thDows=["อา","จ","อ","พ","พฤ","ศ","ส"];
+
+  let html=`<div class="cal-head">${thDows.map(d=>`<div class="cal-dow">${d}</div>`).join("")}</div><div class="cal-grid">`;
+
+  // Prev month filler
+  for(let i=0;i<firstDay;i++){
+    const d=daysInPrev-firstDay+i+1;
+    html+=`<div class="cal-day other-month"><div class="cal-day-num" style="font-size:11px;color:var(--text3)">${d}</div></div>`;
+  }
+  // Current month
+  for(let d=1;d<=daysInMonth;d++){
+    const key=calDateKey(calYear,calMonth,d);
+    const isToday=key===todayKey;
+    const isSel=key===calSelDate;
+    const dayTeams=getTeamsForDate(key).filter(t=>!isSB(t));
+    const pax=dayTeams.reduce((s,t)=>s+mArr(t.members).length,0);
+    const dots=dayTeams.slice(0,5).map(t=>`<span class="cal-team-dot" style="background:${jc(t.jobType||"STANDBY")}"></span>`).join("");
+    html+=`<div class="cal-day${isToday?" today":""}${isSel?" selected":""}" onclick="selectCalDay('${key}',${d})">
+      <div class="cal-day-num"${isToday?' style="background:var(--blue);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center"':''}>${d}</div>
+      ${dayTeams.length?`<div class="cal-teams-row">${dots}</div><div class="cal-pax">${dayTeams.length}ทีม·${pax}คน</div>`:""}
+    </div>`;
+  }
+  // Next month filler
+  const total=firstDay+daysInMonth;
+  const remaining=(7-total%7)%7;
+  for(let i=1;i<=remaining;i++){
+    html+=`<div class="cal-day other-month"><div class="cal-day-num" style="font-size:11px;color:var(--text3)">${i}</div></div>`;
+  }
+  html+="</div>";
+  document.getElementById("cal-container").innerHTML=html;
+}
+
+function renderYearView(){
+  const thMonths=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+  let html=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">`;
+  for(let m=0;m<12;m++){
+    const daysInMonth=new Date(calYear,m+1,0).getDate();
+    let totalTeams=0,totalPax=0;
+    for(let d=1;d<=daysInMonth;d++){
+      const key=calDateKey(calYear,m,d);
+      const dt=getTeamsForDate(key).filter(t=>!isSB(t));
+      totalTeams+=dt.length;
+      totalPax+=dt.reduce((s,t)=>s+mArr(t.members).length,0);
+    }
+    const today=new Date(),isThisMonth=(calYear===today.getFullYear()&&m===today.getMonth());
+    html+=`<div class="cal-day" style="min-height:70px;cursor:pointer" onclick="calMonth=${m};calView='month';document.getElementById('vbtn-month').classList.add('on');document.getElementById('vbtn-year').classList.remove('on');renderCalendar()">
+      <div style="font-size:13px;font-weight:700;color:${isThisMonth?"var(--blue)":"var(--text)"};">${thMonths[m]} ${calYear+543}</div>
+      ${totalTeams?`<div style="font-size:11px;color:var(--text2);margin-top:4px">${totalTeams} ทีม</div><div style="font-size:10px;color:var(--text3)">${totalPax} คน</div>`:`<div style="font-size:10px;color:var(--text3);margin-top:4px">ไม่มีข้อมูล</div>`}
+    </div>`;
+  }
+  html+="</div>";
+  document.getElementById("cal-container").innerHTML=html;
+}
+
+function selectCalDay(key,dayNum){
+  calSelDate=key;
+  renderMonthView(); // re-render to show selection
+  const panel=document.getElementById("day-panel");
+  const thMonths=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  document.getElementById("day-panel-title").textContent=`📅 ${dayNum} ${thMonths[calMonth]} ${calYear+543}`;
+  const today=new Date(),todayKey=calDateKey(today.getFullYear(),today.getMonth(),today.getDate());
+  const planBtn=document.getElementById("day-plan-btn");
+  if(isAdmin){planBtn.style.display="flex";planBtn.textContent=key===todayKey?"✎ แก้ไขวันนี้":"✎ วางแผน";}
+  else planBtn.style.display="none";
+  const dayTeams=getTeamsForDate(key);
+  const act=dayTeams.filter(t=>!isSB(t));
+  let content="";
+  if(act.length){
+    content=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">`;
+    act.forEach(t=>{
+      const p=DPAL[(t.id||1)-1]||{bg:"#636366",n:"T-"+t.id};const c=jc(t.jobType);
+      content+=`<div style="background:var(--bg3);border:.5px solid var(--border);border-radius:10px;padding:10px 12px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">
+          <div style="width:24px;height:24px;border-radius:5px;background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff">${p.n}</div>
+          <span style="font-weight:600;font-size:12px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.site||"—"}</span>
+          <span class="jpill" style="background:${jbg(t.jobType)};color:${c}">${jl(t.jobType)}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text2)">${t.depart||"—"} → ${t.arrive||"—"}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px">${t.members||"—"}</div>
+      </div>`;
+    });
+    content+="</div>";
+  }else{
+    content=`<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px">ไม่มีแผนงานในวันนี้${isAdmin?" — กดวางแผนเพื่อเพิ่ม":""}</div>`;
+  }
+  document.getElementById("day-panel-content").innerHTML=content;
+  panel.style.display="block";
+  panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function openDayPlan(){
+  // Switch to dispatch tab to edit teams for the selected day
+  // Store the selected date context
+  if(!calSelDate)return;
+  const today=new Date(),todayKey=calDateKey(today.getFullYear(),today.getMonth(),today.getDate());
+  if(calSelDate===todayKey){
+    // Edit today → switch to dispatch tab
+    document.querySelectorAll(".tab")[0].click();
+    toast("แก้ไขแผนงานวันนี้ — กดปุ่ม ✎ บนการ์ดทีม","info");
+  }else{
+    // Future/past day → notify planning mode
+    toast(`กำลังเปิดโหมดวางแผน ${calSelDate} — ฟีเจอร์นี้กำลังพัฒนา`,"info");
+  }
 }
 
 /* ═══════════════════════════ INIT ═════════════════════════ */
