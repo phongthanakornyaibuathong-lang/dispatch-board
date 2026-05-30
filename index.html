@@ -765,7 +765,13 @@ async function ghPUT(path,content,tok,retries=2){
       {headers:{"Authorization":"token "+tok,"Cache-Control":"no-cache"}});
     if(rs.ok){const sd=await rs.json();sha=sd.sha||null;}
   }catch(_){}
-  const b64=btoa(unescape(encodeURIComponent(JSON.stringify(content,null,2))));
+  // Robust base64: handle Thai/Unicode correctly
+  const jsonStr=JSON.stringify(content,null,2);
+  const encoder=new TextEncoder();
+  const bytes=encoder.encode(jsonStr);
+  let binary="";
+  for(let i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);
+  const b64=btoa(binary);
   const body={message:"Update "+path+" "+new Date().toLocaleString("th-TH"),content:b64};
   if(sha)body.sha=sha;
   const r=await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,{
