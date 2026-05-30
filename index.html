@@ -83,13 +83,13 @@ body { font-family: var(--ff); background: var(--bg); color: var(--text); font-s
 
 /* ── AIT Logo SVG ── */
 .nav-logo {
-  height: 50px; width: 220px; flex-shrink: 0;
+  height: 34px; width: auto; flex-shrink: 0; overflow: visible;
 }
-/* SVG text fills — theme adaptive */
-.logo-title { fill: #FFFFFF; filter: drop-shadow(0 0 1px rgba(255,255,255,.3)); }
-.logo-amp   { fill: #90B8FF; }
-.logo-sub   { fill: #2E73BE; }
-[data-theme="light"] .logo-title { fill: #111827; }
+/* SVG text colours — theme adaptive */
+.logo-title { fill: #FFFFFF; }
+.logo-amp   { fill: #90C0FF; }
+.logo-sub   { fill: #4A9AE8; }
+[data-theme="light"] .logo-title { fill: #0D1F3C; }
 [data-theme="light"] .logo-amp   { fill: #1A3A6E; }
 [data-theme="light"] .logo-sub   { fill: #2E73BE; }
 .nav-divider { width: 1px; height: 20px; background: var(--border); }
@@ -444,13 +444,11 @@ body { font-family: var(--ff); background: var(--bg); color: var(--text); font-s
      NAV
 ════════════════════════════════════ -->
 <nav class="nav">
-  <svg class="nav-logo" viewBox="0 0 320 60" xmlns="http://www.w3.org/2000/svg" aria-label="AIT &amp; Services">
-  <!-- Blue crescent — always blue regardless of theme -->
-  <path d="M 8 6 A 34 34 0 1 0 8 54 A 22 22 0 1 1 8 6 Z" fill="#2E73BE"/>
-  <!-- Title uses CSS class for theme-aware fill -->
-  <text x="52" y="28" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="22" letter-spacing="2" class="logo-title">A.I.T.</text>
-  <text x="148" y="28" font-family="Arial,sans-serif" font-weight="700" font-size="16" letter-spacing=".8" class="logo-amp">&amp; SERVICES</text>
-  <text x="52" y="47" font-family="Arial,sans-serif" font-weight="500" font-size="11" class="logo-sub" letter-spacing=".3">Advanced Industrial Techno &amp; Services Co.,Ltd.</text>
+  <svg class="nav-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 52" width="180" height="34">
+  <path d="M6 5 A30 30 0 1 0 6 47 A18 18 0 1 1 6 5Z" fill="#2E73BE"/>
+  <text x="44" y="23" class="logo-title" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="18" letter-spacing="2">A.I.T.</text>
+  <text x="122" y="23" class="logo-amp" font-family="Arial,sans-serif" font-weight="700" font-size="13" letter-spacing="0.5">&amp; SERVICES</text>
+  <text x="44" y="40" class="logo-sub" font-family="Arial,sans-serif" font-weight="400" font-size="9.5" letter-spacing="0.2">Advanced Industrial Techno &amp; Services Co.,Ltd.</text>
 </svg>
   <div class="nav-divider"></div>
   <div>
