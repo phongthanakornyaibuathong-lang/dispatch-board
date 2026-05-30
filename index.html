@@ -519,6 +519,23 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px
 </div>
 </div>
 
+
+<!-- PLAN FOR FUTURE DATE MODAL -->
+<div class="ov" id="pfov" onclick="if(event.target===this)closePF()">
+<div class="modal" style="max-width:580px">
+  <div class="mhead">
+    <div class="mbg" id="pf-bg" style="background:var(--blue)">📅</div>
+    <div><div class="mt" id="pf-title">วางแผนงาน</div><div class="ms" id="pf-sub">กำหนดทีมงานล่วงหน้า</div></div>
+    <button class="xbtn" onclick="closePF()">✕</button>
+  </div>
+  <div class="mbody" id="pf-body" style="gap:10px"></div>
+  <div class="mfoot">
+    <button class="mbtn" onclick="closePF()">ยกเลิก</button>
+    <button class="mbtn pri" onclick="savePlan()">💾 บันทึกแผน</button>
+  </div>
+</div>
+</div>
+
 <!-- PIN MODAL -->
 <div class="ov" id="pov2" onclick="if(event.target===this)document.getElementById('pov2').classList.remove('open')">
 <div class="pmod">
@@ -1392,12 +1409,13 @@ function calMove(delta){
 function goToday(){calYear=new Date().getFullYear();calMonth=new Date().getMonth();calView="month";document.getElementById("vbtn-month").classList.add("on");document.getElementById("vbtn-year").classList.remove("on");renderCalendar();}
 
 function getTeamsForDate(dateKey){
-  // Check dayPlans first, then historyData, then today's teams
+  // 1. dayPlans (locally planned)
   if(dayPlans[dateKey]) return dayPlans[dateKey].teams;
   const hist=Array.isArray(historyData)?historyData:[];
+  // 2. history by savedAt ISO date prefix
   const hd=hist.find(h=>h.savedAt&&h.savedAt.startsWith(dateKey));
   if(hd) return hd.teams||[];
-  // Today
+  // 3. Today's live teams
   const today=new Date(),tk=calDateKey(today.getFullYear(),today.getMonth(),today.getDate());
   if(dateKey===tk) return teams;
   return [];
@@ -1484,8 +1502,12 @@ function selectCalDay(key,dayNum){
   document.getElementById("day-panel-title").textContent=`📅 ${dayNum} ${thMonths[calMonth]} ${calYear+543}`;
   const today=new Date(),todayKey=calDateKey(today.getFullYear(),today.getMonth(),today.getDate());
   const planBtn=document.getElementById("day-plan-btn");
-  if(isAdmin){planBtn.style.display="flex";planBtn.textContent=key===todayKey?"✎ แก้ไขวันนี้":"✎ วางแผน";}
-  else planBtn.style.display="none";
+  if(isAdmin){
+    planBtn.style.display="flex";
+    const hasPlan=getTeamsForDate(key).some(t=>t.site||t.members);
+    planBtn.textContent=key===todayKey?"✎ แก้ไขวันนี้":(hasPlan?"✎ แก้ไขแผน":"✎ วางแผน");
+    planBtn.style.background=hasPlan?"var(--orange)":"var(--blue)";
+  }else planBtn.style.display="none";
   const dayTeams=getTeamsForDate(key);
   const act=dayTeams.filter(t=>!isSB(t));
   let content="";
@@ -1513,18 +1535,156 @@ function selectCalDay(key,dayNum){
 }
 
 function openDayPlan(){
-  // Switch to dispatch tab to edit teams for the selected day
-  // Store the selected date context
-  if(!calSelDate)return;
+  if(!calSelDate||!isAdmin)return;
   const today=new Date(),todayKey=calDateKey(today.getFullYear(),today.getMonth(),today.getDate());
   if(calSelDate===todayKey){
-    // Edit today → switch to dispatch tab
     document.querySelectorAll(".tab")[0].click();
     toast("แก้ไขแผนงานวันนี้ — กดปุ่ม ✎ บนการ์ดทีม","info");
-  }else{
-    // Future/past day → notify planning mode
-    toast(`กำลังเปิดโหมดวางแผน ${calSelDate} — ฟีเจอร์นี้กำลังพัฒนา`,"info");
+    return;
   }
+  // Future/past day — open planning modal
+  openPlanModal(calSelDate);
+}
+
+function openPlanModal(dateKey){
+  if(!isAdmin)return;
+  const [y,m,d]=dateKey.split("-").map(Number);
+  const thMonths=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  document.getElementById("pf-title").textContent=`วางแผน ${d} ${thMonths[m-1]} ${y+543}`;
+  document.getElementById("pf-sub").textContent=dateKey;
+
+  // Get existing plan for this date or create blank
+  let plan=dayPlans[dateKey];
+  if(!plan){
+    plan={
+      date:dateKey,
+      teams:Array.from({length:10},(_,i)=>({
+        id:i+1,jobType:"STANDBY",site:"",jobNo:"",
+        depart:"",arrive:"",members:"",vehicle:"",equipment:"",contact:""
+      }))
+    };
+  }
+  pfWorkingPlan=JSON.parse(JSON.stringify(plan));
+  renderPlanModal();
+  document.getElementById("pfov").classList.add("open");
+}
+
+let pfWorkingPlan=null;
+
+function renderPlanModal(){
+  if(!pfWorkingPlan)return;
+  const body=document.getElementById("pf-body");
+  const activeTeams=pfWorkingPlan.teams.filter(t=>t.site||t.members);
+  const standby=pfWorkingPlan.teams.filter(t=>!t.site&&!t.members);
+
+  let html=`<div style="background:rgba(10,132,255,.07);border:.5px solid rgba(10,132,255,.15);border-radius:10px;padding:10px 13px;font-size:12px;color:var(--text2)">
+    📋 วางแผนล่วงหน้า — ข้อมูลจะบันทึกแยกต่างหากจากแผนวันนี้
+  </div>`;
+
+  // Active teams
+  html+=`<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:4px">ทีมงาน (${activeTeams.length} ทีม)</div>`;
+  pfWorkingPlan.teams.forEach((t,i)=>{
+    const p=DPAL[i]||{bg:"#636366",n:"T-"+(i+1)};
+    const c=jc(t.jobType);
+    const isSb=!t.site&&!t.members;
+    html+=`<div style="background:var(--bg3);border:.5px solid var(--border);border-radius:12px;padding:11px 13px;${isSb?"opacity:.5":""}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="width:26px;height:26px;border-radius:6px;background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff">${p.n}</div>
+        <div class="jtr" style="flex:1;gap:4px">
+          ${cfg.jobTypes.map(j=>`<button class="jt${t.jobType===j.id?" on":""}" style="font-size:10px;padding:4px 9px;${t.jobType===j.id?"border-color:"+j.color+";background:"+j.color+"18;color:"+j.color:""}" onclick="pfSetJT(${i},'${j.id}')">${j.label}</button>`).join("")}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+        <div class="selw" style="grid-column:1/-1">
+          <select class="fsel" style="font-size:12px;padding:7px 10px" onchange="pfSetSite(${i},this.value)">
+            <option value="">— เลือก Site —</option>
+            ${cfg.sites.map(s=>`<option value="${s}" ${s===t.site?"selected":""}>${s}</option>`).join("")}
+            <option value="_other" ${!cfg.sites.includes(t.site)&&t.site?"selected":""}>อื่นๆ (พิมพ์เอง)</option>
+          </select>
+        </div>
+        ${!cfg.sites.includes(t.site)&&t.site?`<div class="fg full" style="grid-column:1/-1"><input class="fi" style="font-size:12px;padding:7px 10px" value="${t.site||""}" oninput="pfSetSiteText(${i},this.value)" placeholder="ชื่อ Site..."></div>`:""}
+        <input class="fi" style="font-size:12px;padding:7px 10px" value="${t.jobNo||""}" oninput="pfSetField(${i},'jobNo',this.value)" placeholder="Job No.">
+        <input class="fi" style="font-size:12px;padding:7px 10px" value="${t.contact||""}" oninput="pfSetField(${i},'contact',this.value)" placeholder="ติดต่อ">
+        <div class="selw">
+          <select class="fsel" style="font-size:12px;padding:7px 10px" onchange="pfSetField(${i},'depart',this.value)">
+            <option value="">ออก —</option>
+            ${cfg.timeSlots.depart.map(ts=>`<option value="${ts}" ${ts===t.depart?"selected":""}>${ts}</option>`).join("")}
+          </select>
+        </div>
+        <div class="selw">
+          <select class="fsel" style="font-size:12px;padding:7px 10px" onchange="pfSetField(${i},'arrive',this.value)">
+            <option value="">ถึง —</option>
+            ${cfg.timeSlots.arrive.map(ts=>`<option value="${ts}" ${ts===t.arrive?"selected":""}>${ts}</option>`).join("")}
+          </select>
+        </div>
+        <div class="selw" style="grid-column:1/-1">
+          <select class="fsel" style="font-size:12px;padding:7px 10px" onchange="pfAddMember(${i},this.value);this.value=''">
+            <option value="">+ เลือกสมาชิก</option>
+            ${cfg.personnel.map(p=>`<option value="${p.id}">${p.nick||p.id} — ${p.pos||""}</option>`).join("")}
+          </select>
+        </div>
+        <div style="grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px;min-height:28px;background:var(--input);border:.5px solid var(--border);border-radius:8px;padding:5px 8px">
+          ${t.members?t.members.split(",").map(m=>m.trim()).filter(Boolean).map(m=>`<span style="background:${c}18;color:${c};border-radius:5px;padding:2px 8px;font-size:11px;cursor:pointer" onclick="pfRemMember(${i},'${m}')">${m} ×</span>`).join(""):
+          `<span style="font-size:11px;color:var(--text3)">ยังไม่มีสมาชิก</span>`}
+        </div>
+        <div class="selw">
+          <select class="fsel" style="font-size:12px;padding:7px 10px" onchange="pfSetField(${i},'vehicle',this.options[this.selectedIndex].text==='— รถ —'?'':this.options[this.selectedIndex].text)">
+            <option value="">— รถ —</option>
+            ${cfg.vehicles.map(v=>`<option value="${v.label}" ${v.label===t.vehicle?"selected":""}>${v.label}</option>`).join("")}
+          </select>
+        </div>
+        <input class="fi" style="font-size:12px;padding:7px 10px" value="${t.equipment||""}" oninput="pfSetField(${i},'equipment',this.value)" placeholder="เครื่องมือ">
+      </div>
+    </div>`;
+  });
+  body.innerHTML=html;
+}
+
+function pfSetJT(idx,jt){pfWorkingPlan.teams[idx].jobType=jt;renderPlanModal();}
+function pfSetSite(idx,val){
+  pfWorkingPlan.teams[idx].site=val==="_other"?"":val;
+  renderPlanModal();
+}
+function pfSetSiteText(idx,val){pfWorkingPlan.teams[idx].site=val;}
+function pfSetField(idx,field,val){pfWorkingPlan.teams[idx][field]=val;}
+function pfAddMember(idx,name){
+  if(!name)return;
+  const ms=pfWorkingPlan.teams[idx].members?pfWorkingPlan.teams[idx].members.split(",").map(m=>m.trim()).filter(Boolean):[];
+  if(ms.includes(name)){toast(name+" อยู่ในทีมแล้ว","warn");return;}
+  ms.push(name);
+  pfWorkingPlan.teams[idx].members=ms.join(", ");
+  renderPlanModal();
+}
+function pfRemMember(idx,name){
+  const ms=pfWorkingPlan.teams[idx].members.split(",").map(m=>m.trim()).filter(m=>m&&m!==name);
+  pfWorkingPlan.teams[idx].members=ms.join(", ");
+  renderPlanModal();
+}
+function closePF(){document.getElementById("pfov").classList.remove("open");pfWorkingPlan=null;}
+
+async function savePlan(){
+  if(!pfWorkingPlan||!isAdmin)return;
+  const key=pfWorkingPlan.date;
+  dayPlans[key]=JSON.parse(JSON.stringify(pfWorkingPlan));
+  // Also push into historyData for persistence
+  let hist=Array.isArray(historyData)?[...historyData]:[];
+  hist=hist.filter(h=>h.savedAt&&!h.savedAt.startsWith(key));
+  const thMonths=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  const [y,m,d]=key.split("-").map(Number);
+  hist.push({
+    date:`${d} ${thMonths[m-1]} ${y+543}`,
+    day_th:`${d} ${thMonths[m-1]} ${y+543}`,
+    savedAt:key+"T00:00:00.000Z",
+    teams:pfWorkingPlan.teams
+  });
+  historyData=hist;
+  closePF();
+  dirty=true;
+  document.getElementById("sf").classList.add("show");
+  renderCalendar(); // refresh calendar to show dots
+  // Update day panel
+  if(calSelDate===key) selectCalDay(key,d);
+  toast(`✓ บันทึกแผน ${key} — กด Save & Sync เพื่ออัปโหลด`,"ok");
 }
 
 /* ═══════════════════════════ INIT ═════════════════════════ */
