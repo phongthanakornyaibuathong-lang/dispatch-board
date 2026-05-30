@@ -242,6 +242,15 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px
 .pbar span{color:#fff;font-weight:600;font-size:13px}
 
 
+/* Date input theming */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.6);
+  cursor: pointer;
+}
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+}
+
 /* CALENDAR */
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:10px}
 .cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
@@ -292,6 +301,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px
   <button class="theme-btn" id="tbtn" onclick="toggleTheme()" title="เปลี่ยนธีม"></button>
   <button class="nbtn" onclick="openPrint()">🖨 <span class="hs">Print</span></button>
   <button class="nbtn" id="ibtn" style="display:none" onclick="document.getElementById('xlf').click()">📥 <span class="hs">Import</span></button>
+  <button class="nbtn" id="plan-btn" style="display:none" onclick="openNewPlan()">📋 <span class="hs">วางแผน</span></button>
   <button class="nbtn pri" id="mbtn" onclick="toggleMode()">🔒 <span id="mlbl">Admin</span></button>
   <input type="file" id="xlf" accept=".xlsx,.xls" style="display:none">
 </nav>
@@ -523,10 +533,23 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px
 <!-- PLAN FOR FUTURE DATE MODAL -->
 <div class="ov" id="pfov" onclick="if(event.target===this)closePF()">
 <div class="modal" style="max-width:580px">
-  <div class="mhead">
-    <div class="mbg" id="pf-bg" style="background:var(--blue)">📅</div>
-    <div><div class="mt" id="pf-title">วางแผนงาน</div><div class="ms" id="pf-sub">กำหนดทีมงานล่วงหน้า</div></div>
-    <button class="xbtn" onclick="closePF()">✕</button>
+  <div class="mhead" style="flex-direction:column;align-items:stretch;gap:10px;padding-bottom:12px">
+    <div style="display:flex;align-items:center;gap:11px">
+      <div class="mbg" id="pf-bg" style="background:var(--blue)">📅</div>
+      <div style="flex:1"><div class="mt" id="pf-title">วางแผนงาน</div><div class="ms">เลือกวันที่แล้วกรอกข้อมูลทีม</div></div>
+      <button class="xbtn" onclick="closePF()">✕</button>
+    </div>
+    <!-- Date picker row -->
+    <div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border-radius:10px;padding:8px 12px">
+      <span style="font-size:12px;font-weight:600;color:var(--text3);flex-shrink:0">📅 วันที่:</span>
+      <input type="date" id="pf-date-input" class="fi"
+        style="flex:1;font-size:13px;padding:6px 10px;background:var(--input);color:var(--text);border-color:var(--blue)"
+        onchange="pfChangeDate(this.value)">
+      <div style="display:flex;gap:4px">
+        <button class="cal-btn" onclick="pfShiftDate(-1)" title="วันก่อนหน้า">‹</button>
+        <button class="cal-btn" onclick="pfShiftDate(1)"  title="วันถัดไป">›</button>
+      </div>
+    </div>
   </div>
   <div class="mbody" id="pf-body" style="gap:10px"></div>
   <div class="mfoot">
@@ -847,6 +870,7 @@ function enterAdmin(){
   document.getElementById("mbtn").innerHTML="🔓 <span id='mlbl'>ออก</span>";
   document.getElementById("mb").className="mbadge edit";document.getElementById("mb").textContent="EDIT MODE";
   document.getElementById("ibtn").style.display="flex";
+  document.getElementById("plan-btn").style.display="flex";
   document.getElementById("tok-row").style.display="flex";
   document.getElementById("tok-status").textContent=getTok()?"ตั้งค่าแล้ว ✓":"ยังไม่ได้ตั้งค่า";
   renderCards();renderSettings();toast("✓ เข้าโหมดแก้ไข","ok");
@@ -856,6 +880,7 @@ function exitAdmin(){
   document.getElementById("mbtn").innerHTML="🔒 <span id='mlbl'>Admin</span>";
   document.getElementById("mb").className="mbadge";document.getElementById("mb").textContent="VIEW ONLY";
   document.getElementById("ibtn").style.display="none";
+  document.getElementById("plan-btn").style.display="none";
   document.getElementById("sf").classList.remove("show");
   renderCards();toast("ออกจากโหมดแก้ไข","info");
 }
@@ -1550,6 +1575,8 @@ function openPlanModal(dateKey){
   if(!isAdmin)return;
   const [y,m,d]=dateKey.split("-").map(Number);
   const thMonths=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  // Set date picker value (format YYYY-MM-DD)
+  document.getElementById("pf-date-input").value=dateKey;
   document.getElementById("pf-title").textContent=`วางแผน ${d} ${thMonths[m-1]} ${y+543}`;
   document.getElementById("pf-sub").textContent=dateKey;
 
@@ -1577,6 +1604,9 @@ function renderPlanModal(){
   const activeTeams=pfWorkingPlan.teams.filter(t=>t.site||t.members);
   const standby=pfWorkingPlan.teams.filter(t=>!t.site&&!t.members);
 
+  const [ry,rm,rd]=pfWorkingPlan.date.split("-").map(Number);
+  const thM=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  document.getElementById("pf-title").textContent=`วางแผน ${rd} ${thM[rm-1]} ${ry+543}`;
   let html=`<div style="background:rgba(10,132,255,.07);border:.5px solid rgba(10,132,255,.15);border-radius:10px;padding:10px 13px;font-size:12px;color:var(--text2)">
     📋 วางแผนล่วงหน้า — ข้อมูลจะบันทึกแยกต่างหากจากแผนวันนี้
   </div>`;
@@ -1661,6 +1691,34 @@ function pfRemMember(idx,name){
   renderPlanModal();
 }
 function closePF(){document.getElementById("pfov").classList.remove("open");pfWorkingPlan=null;}
+
+function pfChangeDate(newDateStr){
+  if(!newDateStr)return;
+  // Save current teams data before switching date
+  if(pfWorkingPlan){
+    dayPlans[pfWorkingPlan.date]=JSON.parse(JSON.stringify(pfWorkingPlan));
+  }
+  openPlanModal(newDateStr);
+}
+
+function pfShiftDate(delta){
+  const cur=document.getElementById("pf-date-input").value;
+  if(!cur)return;
+  const d=new Date(cur);
+  d.setDate(d.getDate()+delta);
+  const newKey=calDateKey(d.getFullYear(),d.getMonth(),d.getDate());
+  pfChangeDate(newKey);
+}
+
+// Open plan modal from anywhere (e.g. nav button) without needing calendar
+function openNewPlan(){
+  if(!isAdmin){toast("ต้อง Login Admin ก่อน","warn");return;}
+  const today=new Date();
+  // Default to tomorrow
+  const tmr=new Date(today);tmr.setDate(tmr.getDate()+1);
+  const key=calDateKey(tmr.getFullYear(),tmr.getMonth(),tmr.getDate());
+  openPlanModal(key);
+}
 
 async function savePlan(){
   if(!pfWorkingPlan||!isAdmin)return;
